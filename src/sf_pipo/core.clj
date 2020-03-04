@@ -1,7 +1,8 @@
 (ns sf-pipo.core
   (:require [ring.adapter.jetty :as webserver]
             [ring.middleware.reload :refer [wrap-reload]]
-            [compojure.core :refer [defroutes GET PUT]]
+            [ring.middleware.defaults :refer :all]
+            [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [not-found]]
             [ring.handler.dump :refer [handle-dump]]
             [clojure.java.io :as io]))
@@ -32,7 +33,7 @@
   (GET "/" [] welcome)
   (GET "/file/:filename" [] get-file)
   (GET "/request-info" [] handle-dump)
-  (PUT "/save/:filename" [] save-file)
+  (POST "/save/:filename" [] save-file)
   (not-found "<h1>This is not the page you are looking for</h1>
               <p>Sorry, the page you requested was not found!</p>"))
 

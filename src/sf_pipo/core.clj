@@ -25,19 +25,30 @@
      :body (io/input-stream "testfile")
      :headers {}}))
 
-(defn save-file
+(defn move-file
+  [tmpfile filename]
+  (let [target-filename (str (System/getProperty "user.dir") "/" filename)
+        tmp-file (.toPath tmpfile)
+        target-file (.toPath (io/file target-filename))]
+    (java.nio.file.Files/move tmp-file target-file
+                              (into-array java.nio.file.CopyOption
+                                          [(java.nio.file.StandardCopyOption/REPLACE_EXISTING)]))))
+
+(defn upload-file
   "Save a passed file to the fs."
   [request]
-  (let [fi (get-in request [:multipart-params "file" :tempfile])]
-    (with-open [w (io/writer fi)]
-      (.write w "")))) ;; TODO save the file locally, not in `/tmp/`
+  (let [tmpfile (get-in request [:multipart-params "file" :tempfile])
+        filename (get-in request [:multipart-params "file" :filename])]
+    (move-file tmpfile filename)
+    {:status 200
+     :headers {}}))
 
 (defroutes app
   (GET "/" [] welcome)
   (GET "/file/:filename" [] get-file)
   (GET "/request-info" [] handle-dump)
   (wrap-multipart-params
-   (POST "/save/:filename" [] save-file))
+   (POST "/upload/" [] upload-file))
   (not-found "<h1>This is not the page you are looking for</h1>
               <p>Sorry, the page you requested was not found!</p>"))
 

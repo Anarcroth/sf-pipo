@@ -1,14 +1,14 @@
-(ns sf-pipo.core
+(ns sfpipo.core
   (:require [ring.adapter.jetty :as webserver]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.defaults :refer :all]
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
+            [ring.handler.dump :refer [handle-dump]]
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [not-found]]
-            [ring.handler.dump :refer [handle-dump]]
-            [clojure.java.io :as io]
-            [clojure.contrib.duck-streams :as ds]))
+            [clojure.java.io :as io])
+  (:import [java.nio.file Files StandardCopyOption]))
 
 (defn welcome
   "A warm welcome."
@@ -20,19 +20,18 @@
 (defn get-file
   "Get file by filename, saved on the fs."
   [request]
-  (let [filename (get-in request [:route-params :filename])]
+  (let [filename (get-in request [:route-params :name])]
     {:status 200
-     :body (io/input-stream "testfile")
+     :body (io/input-stream filename)
      :headers {}}))
 
 (defn move-file
+  "Move temporary file from request to project folder.
+  NOTE: Will replace if same file exists."
   [tmpfile filename]
-  (let [target-filename (str (System/getProperty "user.dir") "/" filename)
-        tmp-file (.toPath tmpfile)
-        target-file (.toPath (io/file target-filename))]
-    (java.nio.file.Files/move tmp-file target-file
-                              (into-array java.nio.file.CopyOption
-                                          [(java.nio.file.StandardCopyOption/REPLACE_EXISTING)]))))
+  (let [target-file (io/file (str (System/getProperty "user.dir") "/" filename))]
+    (Files/move (.toPath tmpfile) (.toPath target-file)
+                (into-array java.nio.file.CopyOption [(StandardCopyOption/REPLACE_EXISTING)]))))
 
 (defn upload-file
   "Save a passed file to the fs."
@@ -45,7 +44,7 @@
 
 (defroutes app
   (GET "/" [] welcome)
-  (GET "/file/:filename" [] get-file)
+  (GET "/file/:name" [] get-file)
   (GET "/request-info" [] handle-dump)
   (wrap-multipart-params
    (POST "/upload/" [] upload-file))

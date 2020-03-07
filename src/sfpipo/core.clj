@@ -70,7 +70,7 @@
   (GET "/file/:name" [] get-file)
   (DELETE "/file/:name" [] delete-file)
   (wrap-multipart-params
-   (POST "/upload/" [] upload-file))
+   (POST "/upload" [] upload-file))
   (not-found "<h1>This is not the page you are looking for</h1>"))
 
 ;; Prod main

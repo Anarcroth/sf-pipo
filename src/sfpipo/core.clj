@@ -5,11 +5,16 @@
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [ring.handler.dump :refer [handle-dump]]
-            [compojure.core :refer [defroutes GET POST]]
+            [compojure.core :refer [defroutes GET POST DELETE]]
             [compojure.route :refer [not-found]]
             [environ.core :refer [env]]
             [clojure.java.io :as io])
-  (:import [java.nio.file Files StandardCopyOption]))
+  (:import [java.nio.file Files StandardCopyOption]
+           [java.io File]))
+
+(def proj-dir (str (System/getProperty "user.dir") "/"))
+(def crypt-files "crypt-files/")
+(def crypt-dir (str proj-dir crypt-files))
 
 (defn welcome
   "A warm welcome."
@@ -18,19 +23,35 @@
    :body "<h1>Hello and how did you find this page?</h1>"
    :headers {}})
 
+(defn list-files
+  [request]
+  {:status 200
+   :body (for [file (.listFiles (io/file crypt-dir))]
+           (str (.getName file) "\n"))
+   :headers {}})
+
 (defn get-file
   "Get file by filename, saved on the fs."
   [request]
   (let [filename (get-in request [:route-params :name])]
     {:status 200
-     :body (io/input-stream filename)
+     :body (io/input-stream (str crypt-files filename))
+     :headers {}}))
+
+(defn delete-file
+  "Delete file by filename, saved on the fs."
+  [request]
+  (let [filename (get-in request [:route-params :name])]
+    {:status 200
+     :body (io/delete-file (str crypt-files filename))
      :headers {}}))
 
 (defn move-file
   "Move temporary file from request to project folder.
   NOTE: Will replace if same file exists."
   [tmpfile filename]
-  (let [target-file (io/file (str (System/getProperty "user.dir") "/" filename))]
+  (.mkdir (io/file crypt-dir))
+  (let [target-file (io/file (str crypt-dir filename))]
     (Files/move (.toPath tmpfile) (.toPath target-file)
                 (into-array java.nio.file.CopyOption [(StandardCopyOption/REPLACE_EXISTING)]))))
 
@@ -45,12 +66,12 @@
 
 (defroutes app
   (GET "/" [] welcome)
+  (GET "/list-files" [] list-files)
   (GET "/file/:name" [] get-file)
-  (GET "/request-info" [] handle-dump)
+  (DELETE "/file/:name" [] delete-file)
   (wrap-multipart-params
    (POST "/upload/" [] upload-file))
-  (not-found "<h1>This is not the page you are looking for</h1>
-              <p>Sorry, the page you requested was not found!</p>"))
+  (not-found "<h1>This is not the page you are looking for</h1>"))
 
 ;; Prod main
 (defn -main

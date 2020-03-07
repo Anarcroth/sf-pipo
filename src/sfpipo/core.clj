@@ -7,6 +7,7 @@
             [ring.handler.dump :refer [handle-dump]]
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [not-found]]
+            [environ.core :refer [env]]
             [clojure.java.io :as io])
   (:import [java.nio.file Files StandardCopyOption]))
 
@@ -54,14 +55,17 @@
 ;; Prod main
 (defn -main
   "A very simple web server on Jetty that ping-pongs a couple of files."
-  [port-number]
-  (webserver/run-jetty
-   app
-   {:port (Integer. port-number)}))
+  [& [port]]
+  (let [port (Integer. (or port (env :port) 8000))]
+    (webserver/run-jetty
+     app
+     {:port port
+      :join? false})))
 
 ;; Dev main
 (defn -dev-main
   "A very simple web server on Jetty that ping-pongs a couple of files."
-  [port-number]
-  (webserver/run-jetty (wrap-reload #'app)
-     {:port (Integer. port-number)}))
+  [& [port]]
+  (let [port (Integer. (or port (env :port) 8000))]
+    (webserver/run-jetty (wrap-reload #'app)
+                         {:port port :join? false})))

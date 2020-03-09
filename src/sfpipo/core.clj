@@ -8,7 +8,8 @@
             [compojure.core :refer [defroutes GET POST DELETE]]
             [compojure.route :refer [not-found]]
             [environ.core :refer [env]]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [clojure.tools.logging :as log])
   (:import [java.nio.file Files StandardCopyOption]
            [java.io File]))
 
@@ -20,31 +21,37 @@
   "A warm welcome."
   [request]
   {:status 200
-   :body "<h1>Hello and how did you find this page?</h1>"
-   :headers {}})
+   :body "<h1>Hello and how did you find this page?</h1>"})
+
+(defn get-files-list
+  "List files in given directory."
+  [files]
+  (for [file files]
+    (str (.getName file) "\n")))
 
 (defn list-files
   [request]
-  {:status 200
-   :body (for [file (.listFiles (io/file crypt-dir))]
-           (str (.getName file) "\n"))
-   :headers {}})
+  (log/info "Listing files.")
+  (let [files (.listFiles (io/file crypt-dir))]
+    (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str (get-files-list files))))
+    {:status 200
+     :body (get-files-list files)}))
 
 (defn get-file
   "Get file by filename, saved on the fs."
   [request]
   (let [filename (get-in request [:route-params :name])]
+    (log/info (format "Getting file '%s'" filename))
     {:status 200
-     :body (io/input-stream (str crypt-files filename))
-     :headers {}}))
+     :body (io/input-stream (str crypt-files filename))}))
 
 (defn delete-file
   "Delete file by filename, saved on the fs."
   [request]
   (let [filename (get-in request [:route-params :name])]
+    (log/info (format "Deleting file '%s'" filename))
     {:status 200
-     :body (io/delete-file (str crypt-files filename))
-     :headers {}}))
+     :body (io/delete-file (str crypt-files filename))}))
 
 (defn move-file
   "Move temporary file from request to project folder.
@@ -60,9 +67,9 @@
   [request]
   (let [tmpfile (get-in request [:multipart-params "file" :tempfile])
         filename (get-in request [:multipart-params "file" :filename])]
+    (log/info (format "Uploading '%s'" filename))
     (move-file tmpfile filename)
-    {:status 200
-     :headers {}}))
+    {:status 200}))
 
 (defroutes app
   (GET "/" [] welcome)

@@ -17,11 +17,11 @@
 (def crypt-files "crypt-files/")
 (def crypt-dir (str proj-dir crypt-files))
 
-(defn welcome
-  "A warm welcome."
+(defn ping
+  "Handle ping request."
   [request]
   {:status 200
-   :body "<h1>Hello and how did you find this page?</h1>"})
+   :body "pong\n"})
 
 (defn get-files-list
   "List files in given directory."
@@ -50,8 +50,9 @@
   [request]
   (let [filename (get-in request [:route-params :name])]
     (log/info (format "Deleting file '%s'" filename))
+    (io/delete-file (str crypt-files filename))
     {:status 200
-     :body (io/delete-file (str crypt-files filename))}))
+     :body (format "Deleted '%s'\n" filename)}))
 
 (defn move-file
   "Move temporary file from request to project folder.
@@ -69,10 +70,11 @@
         filename (get-in request [:multipart-params "file" :filename])]
     (log/info (format "Uploading '%s'" filename))
     (move-file tmpfile filename)
-    {:status 200}))
+    {:status 200
+     :body (format "Uploaded '%s'\n" filename)}))
 
 (defroutes app
-  (GET "/" [] welcome)
+  (GET "/ping" [] ping)
   (GET "/list-files" [] list-files)
   (GET "/file/:name" [] get-file)
   (DELETE "/file/:name" [] delete-file)

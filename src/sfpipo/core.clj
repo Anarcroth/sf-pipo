@@ -9,7 +9,8 @@
             [compojure.route :refer [not-found]]
             [environ.core :refer [env]]
             [clojure.java.io :as io]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [sfpipo.otp :as otp])
   (:import [java.nio.file Files StandardCopyOption]
            [java.io File]))
 
@@ -87,6 +88,7 @@
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
   (let [port (Integer. (or port (env :port) 8000))]
+    (log/info (otp/gen-otp))
     (webserver/run-jetty
      app
      {:port port
@@ -97,5 +99,6 @@
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
   (let [port (Integer. (or port (env :port) 8000))]
+    (log/info (otp/gen-otp))
     (webserver/run-jetty (wrap-reload #'app)
                          {:port port :join? false})))

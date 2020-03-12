@@ -9,7 +9,8 @@
                  [compojure "1.6.1"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [environ "1.1.0"]
-                 [org.clojure/tools.logging "1.0.0"]]
+                 [org.clojure/tools.logging "1.0.0"]
+                 [buddy/buddy-auth "2.2.0"]]
   :min-lein-version "2.0.0"
   :repl-options {:init-ns sfpipo.core}
   :uberjar-name "sfpipo.jar"

@@ -10,13 +10,29 @@
             [environ.core :refer [env]]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
+            [buddy.auth.backends :as backends]
+            [buddy.auth.middleware :refer [wrap-authentication]]
+            [buddy.auth.middleware :refer [wrap-authorization]]
             [sfpipo.otp :as otp])
   (:import [java.nio.file Files StandardCopyOption]
            [java.io File]))
 
+(def session-otp (otp/gen-otp))
+
 (def proj-dir (str (System/getProperty "user.dir") "/"))
 (def crypt-files "crypt-files/")
 (def crypt-dir (str proj-dir crypt-files))
+
+(defn authenticate
+  [request authdata]
+  (let [username (:username authdata)
+        password (:password authdata)]
+    (and
+     (= username (:username session-otp))
+     (= password (:passwd session-otp)))))
+
+(def backend (backends/basic {:realm "sfpipo"
+                              :authfn authenticate}))
 
 (defn ping
   "Handle ping request."
@@ -74,10 +90,18 @@
     {:status 200
      :body (format "Uploaded '%s'\n" filename)}))
 
+(defn request-info
+  "View the information contained in the request, useful for debugging"
+  [request]
+  {:status 200
+   :body (pr-str request)
+   :headers {}})
+
 (defroutes app
   (GET "/ping" [] ping)
   (GET "/list-files" [] list-files)
   (GET "/file/:name" [] get-file)
+  (GET "/request-info" [] request-info)
   (DELETE "/file/:name" [] delete-file)
   (wrap-multipart-params
    (POST "/upload" [] upload-file))
@@ -88,7 +112,7 @@
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
   (let [port (Integer. (or port (env :port) 8000))]
-    (log/info (otp/gen-otp))
+    (log/info session-otp)
     (webserver/run-jetty
      app
      {:port port
@@ -99,6 +123,9 @@
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
   (let [port (Integer. (or port (env :port) 8000))]
-    (log/info (otp/gen-otp))
-    (webserver/run-jetty (wrap-reload #'app)
-                         {:port port :join? false})))
+    (log/info session-otp)
+    (webserver/run-jetty
+     (wrap-reload #'app)
+     {:port port :join? false})
+    (wrap-authentication backend)
+    (wrap-authorization backend)))

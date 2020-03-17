@@ -12,3 +12,13 @@
   "Get random one time user."
   []
   {:username (UUID/randomUUID) :passwd (gen-passwd 20)})
+
+(def session-otp (gen-otp))
+
+(defn authenticate
+  [request authdata]
+  (let [username (:username authdata)
+        password (:password authdata)]
+    (and
+     (= (UUID/fromString username) (:username session-otp))
+     (= password (:passwd session-otp)))))

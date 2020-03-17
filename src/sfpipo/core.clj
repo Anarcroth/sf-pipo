@@ -10,29 +10,20 @@
             [environ.core :refer [env]]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
+            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [buddy.auth.backends :as backends]
-            [buddy.auth.middleware :refer [wrap-authentication]]
-            [buddy.auth.middleware :refer [wrap-authorization]]
+            [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
+            [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [sfpipo.otp :as otp])
   (:import [java.nio.file Files StandardCopyOption]
            [java.io File]))
-
-(def session-otp (otp/gen-otp))
 
 (def proj-dir (str (System/getProperty "user.dir") "/"))
 (def crypt-files "crypt-files/")
 (def crypt-dir (str proj-dir crypt-files))
 
-(defn authenticate
-  [request authdata]
-  (let [username (:username authdata)
-        password (:password authdata)]
-    (and
-     (= username (:username session-otp))
-     (= password (:passwd session-otp)))))
-
 (def backend (backends/basic {:realm "sfpipo"
-                              :authfn authenticate}))
+                              :authfn otp/authenticate}))
 
 (defn ping
   "Handle ping request."
@@ -48,28 +39,35 @@
 
 (defn list-files
   [request]
-  (log/info "Listing files.")
-  (let [files (.listFiles (io/file crypt-dir))]
-    (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str (get-files-list files))))
-    {:status 200
-     :body (get-files-list files)}))
+  (if (authenticated? request)
+    (do
+      (log/info "Listing files.")
+      (let [files (.listFiles (io/file crypt-dir))]
+        (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str (get-files-list files))))
+        {:status 200
+         :body (get-files-list files)}))
+    (throw-unauthorized)))
 
 (defn get-file
   "Get file by filename, saved on the fs."
   [request]
-  (let [filename (get-in request [:route-params :name])]
-    (log/info (format "Getting file '%s'" filename))
-    {:status 200
-     :body (io/input-stream (str crypt-files filename))}))
+  (if (authenticated? request)
+    (let [filename (get-in request [:route-params :name])]
+      (log/info (format "Getting file '%s'" filename))
+      {:status 200
+       :body (io/input-stream (str crypt-files filename))})
+    (throw-unauthorized)))
 
 (defn delete-file
   "Delete file by filename, saved on the fs."
   [request]
-  (let [filename (get-in request [:route-params :name])]
-    (log/info (format "Deleting file '%s'" filename))
-    (io/delete-file (str crypt-files filename))
-    {:status 200
-     :body (format "Deleted '%s'\n" filename)}))
+  (if (authenticated? request)
+    (let [filename (get-in request [:route-params :name])]
+      (log/info (format "Deleting file '%s'" filename))
+      (io/delete-file (str crypt-files filename))
+      {:status 200
+       :body (format "Deleted '%s'\n" filename)})
+    (throw-unauthorized)))
 
 (defn move-file
   "Move temporary file from request to project folder.
@@ -83,28 +81,21 @@
 (defn upload-file
   "Save a passed file to the fs."
   [request]
-  (let [tmpfile (get-in request [:multipart-params "file" :tempfile])
-        filename (get-in request [:multipart-params "file" :filename])]
-    (log/info (format "Uploading '%s'" filename))
-    (move-file tmpfile filename)
-    {:status 200
-     :body (format "Uploaded '%s'\n" filename)}))
-
-(defn request-info
-  "View the information contained in the request, useful for debugging"
-  [request]
-  {:status 200
-   :body (pr-str request)
-   :headers {}})
+  (if (authenticated? request)
+    (let [tmpfile (get-in request [:multipart-params "file" :tempfile])
+          filename (get-in request [:multipart-params "file" :filename])]
+      (log/info (format "Uploading '%s'" filename))
+      (move-file tmpfile filename)
+      {:status 200
+       :body (format "Uploaded '%s'\n" filename)})
+    (throw-unauthorized)))
 
 (defroutes app
   (GET "/ping" [] ping)
   (GET "/list-files" [] list-files)
   (GET "/file/:name" [] get-file)
-  (GET "/request-info" [] request-info)
   (DELETE "/file/:name" [] delete-file)
-  (wrap-multipart-params
-   (POST "/upload" [] upload-file))
+  (wrap-multipart-params (POST "/upload" [] upload-file))
   (not-found "<h1>This is not the page you are looking for</h1>"))
 
 ;; Prod main
@@ -112,7 +103,7 @@
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
   (let [port (Integer. (or port (env :port) 8000))]
-    (log/info session-otp)
+    (log/info otp/session-otp)
     (webserver/run-jetty
      app
      {:port port
@@ -122,10 +113,9 @@
 (defn -dev-main
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
+  (log/info otp/session-otp)
   (let [port (Integer. (or port (env :port) 8000))]
-    (log/info session-otp)
-    (webserver/run-jetty
-     (wrap-reload #'app)
-     {:port port :join? false})
-    (wrap-authentication backend)
-    (wrap-authorization backend)))
+    (as-> app $
+      (wrap-authorization $ backend)
+      (wrap-authentication $ backend)
+      (webserver/run-jetty $ {:port port :join? false}))))

@@ -5,7 +5,7 @@
   "Generate a random password for per instance run use only."
   [n]
   (let [chars (map char (range 33 127))
-        password (take n (repeatedly #(rand-nth chars)))]
+        password (repeatedly n #(rand-nth chars))]
     (reduce str password)))
 
 (defn gen-otp

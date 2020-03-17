@@ -40,12 +40,11 @@
 (defn list-files
   [request]
   (if (authenticated? request)
-    (do
+    (let [files (.listFiles (io/file crypt-dir))]
       (log/info "Listing files.")
-      (let [files (.listFiles (io/file crypt-dir))]
-        (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str (get-files-list files))))
-        {:status 200
-         :body (get-files-list files)}))
+      (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str (get-files-list files))))
+      {:status 200
+       :body (get-files-list files)})
     (throw-unauthorized)))
 
 (defn get-file

@@ -52,28 +52,28 @@ Currently, the server supports:
 * Getting files.
 ``` bash
 # Get file from server
-cur -X -GET "https://<your address>/file/<filename>" -o <filename>
+curl -u username:password -XGET "https://<your address>/file/<filename>" -o <filename>
 ```
 
 * Uploading files.
 ``` bash
 # Upload file to server
-cur -X -POST "https://<your address>/upload" -F file=@<yourfile>
+curl -u username:password -XPOST "https://<your address>/upload" -F file=@<yourfile>
 ```
 
 * Deleting files.
 ``` bash
 # Delete file from server
-cur -X -DELETE "https://<your address>/file/<filename>"
+curl -u username:password -XDELETE "https://<your address>/file/<filename>"
 ```
 
 * Listing uploaded files.
 ``` bash
 # List uploaded files to server
-cur -X -GET "https://<your address>/list-files"
+curl -u username:password -XGET "https://<your address>/list-files"
 ```
 
-* Throwing errors like a boss. (has to be fixed)
+**NOTE:** What you are seeing in the examples is **not secure**. For sending credentials over curl, check [this](https://stackoverflow.com/questions/2594880/using-curl-with-a-username-and-password) out.
 
 ### Security
 
@@ -81,7 +81,9 @@ SFPIPO **is not secure**. If you upload something over `http` or upload a file t
 
 If you want to upload data that is secured, then encrypt the data beforehand with `gpg` or something else. If you upload encrypted information, even if it gets stolen, [cracking gpg](https://security.stackexchange.com/questions/77340/how-easy-is-it-to-crack-gpg-with-private-key-but-without-password) is a challenge on its own, so don't worry it will get compromised.
 
-**WARNING NOTE:** If you use a remote service, like Heroku, then people who know the address of your app **can** get your files. The risks are smaller for this if you have a self-host, but keep in mind that **currently**, there is no authentication on sfpipo.
+**WARNING NOTE:** If you use a remote service, like Heroku, then people who know the address of your app **can** get your files. The risks are smaller for this if you have a self-host, but keep in mind that **currently**, there is no _legitimate_ authentication on sfpipo.
+
+The authentication that is used now in sfpipo is the following: Each time the app is deployed, a random username and password are generated, thus you'll be able to see these things in the first lines of the initial log. These are the credentials to authenticate against. The problem here is that sending creds over curl is a [very bad idea](https://superuser.com/questions/919859/is-curl-u-usernamepassword-http-example-com-secure). There are ways around it, but _future work_ must be done to make the connection to the server more secure.
 
 ### License
 

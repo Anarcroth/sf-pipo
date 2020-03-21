@@ -14,7 +14,8 @@
             [buddy.auth.backends :as backends]
             [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
-            [sfpipo.otp :as otp])
+            [sfpipo.otp :as otp]
+            [sfpipo.db :as db])
   (:import [java.nio.file Files StandardCopyOption]
            [java.io File]))
 
@@ -31,20 +32,14 @@
   {:status 200
    :body "pong\n"})
 
-(defn get-files-list
-  "List files in given directory."
-  [files]
-  (for [file files]
-    (str (.getName file) "\n")))
-
 (defn list-files
   [request]
   (if (authenticated? request)
-    (let [files (.listFiles (io/file crypt-dir))]
+    (let [files (db/get-file-names)]
       (log/info "Listing files.")
-      (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str (get-files-list files))))
+      (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str files)))
       {:status 200
-       :body (get-files-list files)})
+       :body files})
     (throw-unauthorized)))
 
 (defn get-file
@@ -54,7 +49,7 @@
     (let [filename (get-in request [:route-params :name])]
       (log/info (format "Getting file '%s'" filename))
       {:status 200
-       :body (io/input-stream (str crypt-files filename))})
+       :body (io/input-stream (db/get-file filename))})
     (throw-unauthorized)))
 
 (defn delete-file
@@ -63,19 +58,10 @@
   (if (authenticated? request)
     (let [filename (get-in request [:route-params :name])]
       (log/info (format "Deleting file '%s'" filename))
-      (io/delete-file (str crypt-files filename))
+      (db/delete-file filename)
       {:status 200
        :body (format "Deleted '%s'\n" filename)})
     (throw-unauthorized)))
-
-(defn move-file
-  "Move temporary file from request to project folder.
-  NOTE: Will replace if same file exists."
-  [tmpfile filename]
-  (.mkdir (io/file crypt-dir))
-  (let [target-file (io/file (str crypt-dir filename))]
-    (Files/move (.toPath tmpfile) (.toPath target-file)
-                (into-array java.nio.file.CopyOption [(StandardCopyOption/REPLACE_EXISTING)]))))
 
 (defn upload-file
   "Save a passed file to the fs."
@@ -84,7 +70,7 @@
     (let [tmpfile (get-in request [:multipart-params "file" :tempfile])
           filename (get-in request [:multipart-params "file" :filename])]
       (log/info (format "Uploading '%s'" filename))
-      (move-file tmpfile filename)
+      (db/insert-file filename tmpfile)
       {:status 200
        :body (format "Uploaded '%s'\n" filename)})
     (throw-unauthorized)))
@@ -114,7 +100,7 @@
   [& [port]]
   (log/info otp/session-otp)
   (let [port (Integer. (or port (env :port) 8000))]
-    (as-> app $
+    (as-> (wrap-reload #'app) $
       (wrap-authorization $ backend)
       (wrap-authentication $ backend)
       (webserver/run-jetty $ {:port port :join? false}))))

@@ -4,7 +4,11 @@
 (defn gen-passwd
   "Generate a random password for per instance run use only."
   [n]
-  (let [chars (map char (range 33 127))
+  (let [chars-between #(map char (range (int %1) (inc (int %2))))
+        chars (concat (chars-between \0 \9)
+                      (chars-between \a \z)
+                      (chars-between \A \Z)
+                      [\_])
         password (repeatedly n #(rand-nth chars))]
     (reduce str password)))
 

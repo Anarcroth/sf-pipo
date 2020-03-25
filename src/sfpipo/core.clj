@@ -17,7 +17,8 @@
             [sfpipo.otp :as otp]
             [sfpipo.db :as db])
   (:import [java.nio.file Files StandardCopyOption]
-           [java.io File]))
+           [java.io File])
+  (:gen-class))
 
 (def proj-dir (str (System/getProperty "user.dir") "/"))
 (def crypt-files "crypt-files/")
@@ -87,12 +88,12 @@
 (defn -main
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
+  (log/info otp/session-otp)
   (let [port (Integer. (or port (env :port) 8000))]
-    (log/info otp/session-otp)
-    (webserver/run-jetty
-     app
-     {:port port
-      :join? false})))
+    (as-> app $
+      (wrap-authorization $ backend)
+      (wrap-authentication $ backend)
+      (webserver/run-jetty $ {:port port :join? false}))))
 
 ;; Dev main
 (defn -dev-main

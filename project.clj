@@ -14,10 +14,10 @@
                  [environ "1.1.0"]
                  [buddy/buddy-auth "2.2.0"]]
   :min-lein-version "2.0.0"
-  :repl-options {:init-ns sfpipo.core}
   :uberjar-name "sfpipo.jar"
-  :main sfpipo.core
+  :main ^:skip-aot sfpipo.core
   :profiles {:dev {:main sfpipo.core/-dev-main
                    :plugins [[lein-environ "1.0.0"]]
                    :env {:squiggly {:checkers [:eastwood :kibit :typed]}}}
-             :production {:env {:production true}}})
+             :uberjar {:aot :all
+                       :env {:production true}}})

@@ -89,6 +89,7 @@
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
   (log/info otp/session-otp)
+  (db/setup-db)
   (let [port (Integer. (or port (env :port) 8000))]
     (as-> app $
       (wrap-authorization $ backend)
@@ -100,6 +101,7 @@
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
   (log/info otp/session-otp)
+  (db/setup-db)
   (let [port (Integer. (or port (env :port) 8000))]
     (as-> (wrap-reload #'app) $
       (wrap-authorization $ backend)

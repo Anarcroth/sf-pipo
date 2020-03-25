@@ -9,6 +9,15 @@
                     :user "sfpipo"
                     :password "changemepls"}))
 
+(defn setup-db
+  []
+  (try
+    (sql/db-do-commands sfpipo-db (sql/create-table-ddl :enfile
+                                                        [[:name "text"] [:file :bytea]]
+                                                        {:conditional? true}))
+    (catch Exception e
+      "'enfile' table exists!")))
+
 (defn insert-file
   [name file]
   (sql/insert! sfpipo-db

@@ -1,4 +1,6 @@
 (ns sfpipo.otp
+  (:require [crypto.password.pbkdf2 :as passwd]
+            [sfpipo.db :as db])
   (:import [java.util UUID]))
 
 (defn gen-passwd
@@ -19,10 +21,19 @@
 
 (def session-otp (gen-otp))
 
+(defn is-otp-valid?
+  [username password]
+  (and
+   (= (UUID/fromString username) (:username session-otp))
+   (= password (:passwd session-otp))))
+
+(defn user-exists?
+  [username password]
+  (passwd/check password (:password (db/get-usr username))))
+
 (defn authenticate
   [request authdata]
   (let [username (:username authdata)
         password (:password authdata)]
-    (and
-     (= (UUID/fromString username) (:username session-otp))
-     (= password (:passwd session-otp)))))
+    (or (is-otp-valid? username password)
+        (user-exists? username password))))

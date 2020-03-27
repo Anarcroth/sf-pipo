@@ -1,5 +1,6 @@
 (ns sfpipo.db
-  (:require [clojure.java.jdbc :as sql])
+  (:require [clojure.java.jdbc :as sql]
+            [crypto.password.pbkdf2 :as passwd])
   (:import [java.nio.file Files Paths]
            [java.io File]))
 
@@ -9,14 +10,30 @@
                     :user "sfpipo"
                     :password "changemepls"}))
 
-(defn setup-db
+(defn setup-enfile-table
   []
   (try
-    (sql/db-do-commands sfpipo-db (sql/create-table-ddl :enfile
-                                                        [[:name "text"] [:file :bytea]]
-                                                        {:conditional? true}))
+    (sql/db-do-commands sfpipo-db
+                        (sql/create-table-ddl :enfile
+                                              [[:name "text"] [:file :bytea]]
+                                              {:conditional? true}))
     (catch Exception e
       "'enfile' table exists!")))
+
+(defn setup-user-table
+  []
+  (try
+    (sql/db-do-commands sfpipo-db
+                        (sql/create-table-ddl :user
+                                              [[:name "text"] [:file "text"]]
+                                              {:conditional? true}))
+    (catch Exception e
+      "'user' table exists!")))
+
+(defn setup-db
+  []
+  (setup-enfile-table)
+  (setup-user-table))
 
 (defn insert-file
   [name file]
@@ -40,3 +57,18 @@
   [filename]
   (:file (sql/query sfpipo-db ["select * from enfile where name = ?" filename]
                     {:result-set-fn first})))
+
+(defn delete-usr
+  [username]
+  (sql/delete! sfpipo-db :user ["username = ?" name]))
+
+(defn insert-usr
+  [username password]
+  (sql/insert! sfpipo-db :user
+               {:username username
+                :password (passwd/encrypt password)}))
+
+(defn get-usr
+  [username]
+  (sql/query sfpipo-db ["select * from user where name = ?" username]
+             {:result-set-fn first}))

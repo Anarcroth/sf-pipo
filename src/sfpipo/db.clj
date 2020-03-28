@@ -37,9 +37,9 @@
 
 (defn insert-file
   [name file]
-  (sql/insert! sfpipo-db
-               :enfile {:name name
-                        :file (Files/readAllBytes (.toPath file))}))
+  (sql/insert! sfpipo-db :enfile
+               {:name name
+                :file (Files/readAllBytes (.toPath file))}))
 
 (defn delete-file
   [name]

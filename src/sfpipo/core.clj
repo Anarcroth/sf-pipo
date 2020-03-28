@@ -4,107 +4,32 @@
             [ring.middleware.defaults :refer :all]
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-            [ring.handler.dump :refer [handle-dump]]
             [compojure.core :refer [defroutes GET POST DELETE]]
             [compojure.route :refer [not-found]]
             [environ.core :refer [env]]
-            [clojure.java.io :as io]
             [clojure.tools.logging :as log]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [buddy.auth.backends :as backends]
             [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [sfpipo.otp :as otp]
-            [sfpipo.db :as db])
-  (:import [java.nio.file Files StandardCopyOption]
-           [java.io File])
+            [sfpipo.db :as db]
+            [sfpipo.generic-controller :as gc]
+            [sfpipo.files-controller :as fc]
+            [sfpipo.user-controller :as uc])
   (:gen-class))
 
-(def proj-dir (str (System/getProperty "user.dir") "/"))
-(def crypt-files "crypt-files/")
-(def crypt-dir (str proj-dir crypt-files))
-
-(def backend (backends/basic {:realm "sfpipo"
-                              :authfn otp/authenticate}))
-
-(defn ping
-  "Handle ping request."
-  [request]
-  {:status 200
-   :body "pong\n"})
-
-(defn list-files
-  [request]
-  (if (authenticated? request)
-    (let [files (db/get-file-names)]
-      (log/info "Listing files.")
-      (log/info (format "Found the following '%d' files:\n %s" (count files) (pr-str files)))
-      {:status 200
-       :body files})
-    (throw-unauthorized)))
-
-(defn get-file
-  "Get file by filename, saved on the fs."
-  [request]
-  (if (authenticated? request)
-    (let [filename (get-in request [:route-params :name])]
-      (log/info (format "Getting file '%s'" filename))
-      {:status 200
-       :body (io/input-stream (db/get-file filename))})
-    (throw-unauthorized)))
-
-(defn delete-file
-  "Delete file by filename, saved on the fs."
-  [request]
-  (if (authenticated? request)
-    (let [filename (get-in request [:route-params :name])]
-      (log/info (format "Deleting file '%s'" filename))
-      (db/delete-file filename)
-      {:status 200
-       :body (format "Deleted '%s'\n" filename)})
-    (throw-unauthorized)))
-
-(defn upload-file
-  "Save a passed file to the fs."
-  [request]
-  (if (authenticated? request)
-    (let [tmpfile (get-in request [:multipart-params "file" :tempfile])
-          filename (get-in request [:multipart-params "file" :filename])]
-      (log/info (format "Uploading '%s'" filename))
-      (db/insert-file filename tmpfile)
-      {:status 200
-       :body (format "Uploaded '%s'\n" filename)})
-    (throw-unauthorized)))
-
-(defn delete-user
-  [request]
-  (if (authenticated? request)
-    (let [username (get-in request [:route-params :name])]
-      (log/info (format "Deleteing user '%s'" username))
-      (db/delete-usr username)
-      {:status 200
-       :body (format "Deleted user '%s'" username)})
-    (throw-unauthorized)))
-
-(defn create-user
-  [request]
-  (if (authenticated? request)
-    (let [username (get-in request [:route-params :name])
-          password (get-in request [:route-params :pass])]
-      (log/info (format "Creating user '%s'" username))
-      (db/insert-usr username password)
-      {:status 200
-       :body (format "Created user '%s'" username)})
-    (throw-unauthorized)))
+(def backend (backends/basic
+              {:realm "sfpipo"
+               :authfn otp/authenticate}))
 
 (defroutes app
-  (GET "/ping" [] ping)
-  (GET "/list-files" [] list-files)
-  (GET "/file/:name" [] get-file)
-  (DELETE "/file/:name" [] delete-file)
-  (wrap-multipart-params (POST "/upload" [] upload-file))
-  (DELETE "/usr/:name" [] delete-user)
-  (POST "/usr/:name&:pass" [] create-user)
+  (GET "/ping" [] gc/ping)
+  (GET "/list-files" [] fc/list-files)
+  (GET "/file/:name" [] fc/get-file)
+  (DELETE "/file/:name" [] fc/delete-file)
+  (wrap-multipart-params (POST "/upload" [] fc/upload-file))
+  (DELETE "/usr/:name" [] uc/delete-user)
+  (POST "/usr/:name&:pass" [] uc/create-user)
   (not-found "<h1>This is not the page you are looking for</h1>"))
 
 ;; Prod main

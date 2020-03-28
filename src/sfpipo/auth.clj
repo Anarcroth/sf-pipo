@@ -1,4 +1,4 @@
-(ns sfpipo.otp
+(ns sfpipo.auth
   (:require [crypto.password.pbkdf2 :as passwd]
             [sfpipo.db :as db])
   (:import [java.util UUID]))

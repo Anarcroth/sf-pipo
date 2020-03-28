@@ -11,7 +11,7 @@
             [buddy.auth.backends :as backends]
             [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
-            [sfpipo.otp :as otp]
+            [sfpipo.auth :as auth]
             [sfpipo.db :as db]
             [sfpipo.generic-controller :as gc]
             [sfpipo.files-controller :as fc]
@@ -20,7 +20,7 @@
 
 (def backend (backends/basic
               {:realm "sfpipo"
-               :authfn otp/authenticate}))
+               :authfn auth/authenticate}))
 
 (defroutes app
   (GET "/ping" [] gc/ping)
@@ -36,7 +36,7 @@
 (defn -main
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
-  (log/info otp/session-otp)
+  (log/info auth/session-otp)
   (db/setup-db)
   (let [port (Integer. (or port (env :port) 8000))]
     (as-> app $
@@ -48,7 +48,7 @@
 (defn -dev-main
   "A very simple web server on Jetty that ping-pongs a couple of files."
   [& [port]]
-  (log/info otp/session-otp)
+  (log/info auth/session-otp)
   (db/setup-db)
   (let [port (Integer. (or port (env :port) 8000))]
     (as-> (wrap-reload #'app) $

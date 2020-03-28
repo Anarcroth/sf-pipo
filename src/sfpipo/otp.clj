@@ -24,7 +24,7 @@
 (defn is-otp-valid?
   [username password]
   (and
-   (= (UUID/fromString username) (:username session-otp))
+   (= username (str (:username session-otp)))
    (= password (:passwd session-otp))))
 
 (defn user-exists?

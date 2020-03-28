@@ -24,8 +24,8 @@
   []
   (try
     (sql/db-do-commands sfpipo-db
-                        (sql/create-table-ddl :user
-                                              [[:name "text"] [:file "text"]]
+                        (sql/create-table-ddl :users
+                                              [[:name "text"] [:password "text"]]
                                               {:conditional? true}))
     (catch Exception e
       "'user' table exists!")))
@@ -60,15 +60,15 @@
 
 (defn delete-usr
   [username]
-  (sql/delete! sfpipo-db :user ["username = ?" name]))
+  (sql/delete! sfpipo-db :users ["name = ?" name]))
 
 (defn insert-usr
   [username password]
-  (sql/insert! sfpipo-db :user
-               {:username username
+  (sql/insert! sfpipo-db :users
+               {:name username
                 :password (passwd/encrypt password)}))
 
 (defn get-usr
   [username]
-  (sql/query sfpipo-db ["select * from user where name = ?" username]
+  (sql/query sfpipo-db ["select * from users where name = ?" username]
              {:result-set-fn first}))

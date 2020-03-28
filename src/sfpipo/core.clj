@@ -76,12 +76,35 @@
        :body (format "Uploaded '%s'\n" filename)})
     (throw-unauthorized)))
 
+(defn delete-user
+  [request]
+  (if (authenticated? request)
+    (let [username (get-in request [:route-params :name])]
+      (log/info (format "Deleteing user '%s'" username))
+      (db/delete-usr username)
+      {:status 200
+       :body (format "Deleted user '%s'" username)})
+    (throw-unauthorized)))
+
+(defn create-user
+  [request]
+  (if (authenticated? request)
+    (let [username (get-in request [:route-params :name])
+          password (get-in request [:route-params :pass])]
+      (log/info (format "Creating user '%s'" username))
+      (db/insert-usr username password)
+      {:status 200
+       :body (format "Created user '%s'" username)})
+    (throw-unauthorized)))
+
 (defroutes app
   (GET "/ping" [] ping)
   (GET "/list-files" [] list-files)
   (GET "/file/:name" [] get-file)
   (DELETE "/file/:name" [] delete-file)
   (wrap-multipart-params (POST "/upload" [] upload-file))
+  (DELETE "/usr/:name" [] delete-user)
+  (POST "/usr/:name&:pass" [] create-user)
   (not-found "<h1>This is not the page you are looking for</h1>"))
 
 ;; Prod main

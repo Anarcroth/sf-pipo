@@ -13,7 +13,8 @@
                  [compojure "1.6.1"]
                  [environ "1.1.0"]
                  [buddy/buddy-auth "2.2.0"]
-                 [crypto-password "0.2.1"]]
+                 [crypto-password "0.2.1"]
+                 [hiccup "1.0.5"]]
   :min-lein-version "2.0.0"
   :uberjar-name "sfpipo.jar"
   :main ^:skip-aot sfpipo.core

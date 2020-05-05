@@ -15,7 +15,8 @@
             [sfpipo.db :as db]
             [sfpipo.generic-controller :as gc]
             [sfpipo.files-controller :as fc]
-            [sfpipo.user-controller :as uc])
+            [sfpipo.user-controller :as uc]
+            [sfpipo.frontend :as fe])
   (:gen-class))
 
 (def backend (backends/basic
@@ -23,6 +24,7 @@
                :authfn auth/authenticate}))
 
 (defroutes app
+  (GET "/" [] fe/greet)
   (GET "/ping" [] gc/ping)
   (GET "/list-files" [] fc/list-files)
   (GET "/file/:name" [] fc/get-file)

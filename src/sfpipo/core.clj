@@ -30,6 +30,7 @@
   (GET "/file/:name" [] fc/get-file)
   (DELETE "/file/:name" [] fc/delete-file)
   (wrap-multipart-params (POST "/upload" [] fc/upload-file))
+  (GET "/usr/:name" [] uc/get-user)
   (DELETE "/usr/:name" [] uc/delete-user)
   (POST "/usr/:name&:pass" [] uc/create-user)
   (not-found "<h1>This is not the page you are looking for</h1>"))

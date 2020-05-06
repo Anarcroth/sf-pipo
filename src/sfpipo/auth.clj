@@ -29,7 +29,10 @@
 
 (defn user-exists?
   [username password]
-  (passwd/check password (:password (db/get-usr username))))
+  (let [usrname (:name (db/get-usr username))]
+    (if (and (not-empty usrname)
+             (= username usrname))
+      (passwd/check password (:password (db/get-usr username))))))
 
 (defn authenticate
   [request authdata]

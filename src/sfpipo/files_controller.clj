@@ -21,8 +21,12 @@
   (if (authenticated? request)
     (let [filename (get-in request [:route-params :name])]
       (log/info (format "Getting file '%s'" filename))
-      {:status 200
-       :body (io/input-stream (db/get-file filename))})
+      (let [file (db/get-file filename)]
+        (if (not-empty file)
+          {:status 200
+           :body (io/input-stream (db/get-file filename))}
+          {:status 200
+           :body (format "File '%s' was not found!" filename)})))
     (throw-unauthorized)))
 
 (defn delete-file

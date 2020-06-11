@@ -1,7 +1,8 @@
 (ns sfpipo.frontend
   (:require [sfpipo.user-controller :as db]
             [hiccup.page :as page]
-            [hiccup.form :as form]))
+            [hiccup.form :as form]
+            [ring.util.anti-forgery :as util]))
 
 (defn greet
   [request]
@@ -27,6 +28,7 @@
               [:body
                [:h1 "Add a Location"]
                [:form {:action "/usr/:user-name" :method "GET"}
+                (util/anti-forgery-field) ; prevents cross-site scripting attacks
                 [:p "user name: " [:input {:type "text" :name "user-name" :ng-model "user-name"}]]
                 [:p [:input {:type "submit" :value "submit user name"}]]]]))
 

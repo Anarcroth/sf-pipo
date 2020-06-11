@@ -1,5 +1,6 @@
 (ns sfpipo.frontend
-  (:require [hiccup.page :as page]
+  (:require [sfpipo.user-controller :as db]
+            [hiccup.page :as page]
             [hiccup.form :as form]))
 
 (defn greet
@@ -18,9 +19,23 @@
           [:dev
            (form/text-field {:ng-model "fileName" :placeholder "Enter a file name here"} "file-name")
            (form/form-to [:get "/file/fileName"]
-                         (form/submit-button "Get File"))]
-          [:p]
-          [:div
-           (form/text-field {:ng-model "userName" :placeholder "Enter a user name here"} "user-name")
-           (form/form-to [:get "/usr/userName"]
-                         (form/submit-button "Get User"))]]))
+                         (form/submit-button "Get File"))]]))
+
+(defn user-view
+  [request]
+  (page/html5 {:lang "en"}
+              [:body
+               [:h1 "Add a Location"]
+               [:form {:action "/usr/:user-name" :method "GET"}
+                [:p "user name: " [:input {:type "text" :name "user-name" :ng-model "user-name"}]]
+                [:p [:input {:type "submit" :value "submit user name"}]]]]))
+
+(defn get-user
+  [request]
+  (print request)
+  (let [user (db/get-user request)]
+    (page/html5
+     {:lange "en"}
+     [:body
+      [:h1 "The user you are looking for is"]
+      [:p user]])))

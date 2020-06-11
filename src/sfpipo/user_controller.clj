@@ -5,16 +5,11 @@
   (:gen-class))
 
 (defn get-user
-  [request]
-  (if (authenticated? request)
-    (let [username (get-in request [:route-params :name])]
-      (log/info (format "Getting user '%s'" username))
-      (if (:name (db/get-usr username))
-        {:status 200
-         :body (format "User with '%s' exists!" username)}
-        {:status 200
-         :body (format "No such user '%s'!" username)}))
-    (throw-unauthorized)))
+  [user-name]
+  (log/info (format "Getting user '%s'" user-name))
+  (if (:name (db/get-usr user-name))
+    (db/get-usr user-name)
+    (format "No such user '%s'!" user-name)))
 
 (defn delete-user
   [request]

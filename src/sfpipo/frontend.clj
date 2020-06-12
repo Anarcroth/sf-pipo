@@ -2,6 +2,8 @@
   (:require [sfpipo.user-controller :as db]
             [hiccup.page :as page]
             [hiccup.form :as form]
+            [sfpipo.user-controller :as user-controller]
+            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [ring.util.anti-forgery :as util]))
 
 (defn greet
@@ -22,22 +24,12 @@
            (form/form-to [:get "/file/fileName"]
                          (form/submit-button "Get File"))]]))
 
-(defn user-view
-  [request]
-  (page/html5 {:lang "en"}
-              [:body
-               [:h1 "Add a Location"]
-               [:form {:action "/usr/:user-name" :method "GET"}
-                (util/anti-forgery-field) ; prevents cross-site scripting attacks
-                [:p "user name: " [:input {:type "text" :name "user-name" :ng-model "user-name"}]]
-                [:p [:input {:type "submit" :value "submit user name"}]]]]))
-
 (defn get-user
   [request]
-  (print request)
-  (let [user (db/get-user request)]
-    (page/html5
-     {:lange "en"}
-     [:body
-      [:h1 "The user you are looking for is"]
-      [:p user]])))
+  (if (authenticated? request)
+    (let [user-name (get-in request [:route-params :user-name])
+          user (user-controller/get-user user-name)]
+      (page/html5
+       [:body
+        [:h1 "The user you are looking for is " user]]))
+      (throw-unauthorized)))

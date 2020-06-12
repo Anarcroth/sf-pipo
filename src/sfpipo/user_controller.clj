@@ -7,9 +7,8 @@
 (defn get-user
   [user-name]
   (log/info (format "Getting user '%s'" user-name))
-  (if (:name (db/get-usr user-name))
-    (db/get-usr user-name)
-    (format "No such user '%s'!" user-name)))
+  (let [name (:name (db/get-usr user-name))]
+    (or name (format "No such user '%s'!" name))))
 
 (defn delete-user
   [request]

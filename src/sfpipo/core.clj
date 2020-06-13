@@ -16,7 +16,7 @@
             [sfpipo.generic-controller :as gc]
             [sfpipo.files-controller :as fc]
             [sfpipo.user-controller :as uc]
-            [sfpipo.frontend :as fe])
+            [sfpipo.view :as view])
   (:gen-class))
 
 (def backend (backends/basic
@@ -24,13 +24,13 @@
                :authfn auth/authenticate}))
 
 (defroutes app
-  (GET "/" [] fe/greet)
+  (GET "/" [] view/greet)
   (GET "/ping" [] gc/ping)
   (GET "/list-files" [] fc/list-files)
   (GET "/file/:name" [] fc/get-file)
   (DELETE "/file/:name" [] fc/delete-file)
   (wrap-multipart-params (POST "/upload" [] fc/upload-file))
-  (GET "/usr/:user-name" [] fe/get-user)
+  (GET "/usr/:user-name" [] view/get-user)
   (DELETE "/usr/:name" [] uc/delete-user)
   (POST "/usr/:name&:pass" [] uc/create-user)
   (not-found "<h1>This is not the page you are looking for</h1>"))

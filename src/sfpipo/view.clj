@@ -1,4 +1,4 @@
-(ns sfpipo.frontend
+(ns sfpipo.view
   (:require [sfpipo.user-controller :as db]
             [hiccup.page :as page]
             [hiccup.form :as form]

@@ -3,6 +3,7 @@
             [hiccup.page :as page]
             [hiccup.form :as form]
             [sfpipo.user-controller :as user-controller]
+            [sfpipo.generic-controller :as generic-controller]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [ring.util.anti-forgery :as util]))
 
@@ -23,9 +24,6 @@
   (page/html5 {:lang "en"}
          [:body
           [:div [:h1 "Sfpipo"]]
-          [:dev
-           (form/form-to [:get "/ping"]
-                         (form/submit-button "Ping"))]
           [:p]
           [:dev
            (form/form-to [:get "/list-files"]
@@ -35,6 +33,10 @@
            (form/text-field {:ng-model "fileName" :placeholder "Enter a file name here"} "file-name")
            (form/form-to [:get "/file/fileName"]
                          (form/submit-button "Get File"))]]))
+
+(defn ping
+  [request]
+  (generate-response-page (generic-controller/ping)))
 
 (defn get-user
   [request]

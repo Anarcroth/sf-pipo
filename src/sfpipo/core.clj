@@ -13,9 +13,7 @@
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [sfpipo.auth :as auth]
             [sfpipo.db :as db]
-            [sfpipo.generic-controller :as gc]
             [sfpipo.files-controller :as fc]
-            [sfpipo.user-controller :as uc]
             [sfpipo.view :as view])
   (:gen-class))
 
@@ -25,7 +23,7 @@
 
 (defroutes app
   (GET "/" [] view/greet)
-  (GET "/ping" [] gc/ping)
+  (GET "/ping" [] view/ping)
   (GET "/list-files" [] fc/list-files)
   (GET "/file/:name" [] fc/get-file)
   (DELETE "/file/:name" [] fc/delete-file)

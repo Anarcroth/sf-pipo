@@ -51,5 +51,4 @@
   [request]
   (let [name (extract-req-param request :name)
         password (extract-req-param request :pass)]
-    (user-controller/create-user name password)
-    (generate-response-page (str "Created user " name))))
+    (generate-response-page (user-controller/create-user name password))))

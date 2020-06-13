@@ -22,4 +22,8 @@
 (defn create-user
   [name pass]
   (log/info (format "Creating user '%s'" name))
-  (db/insert-usr name pass))
+  (if-not (:name (db/get-usr name))
+    (do
+      (db/insert-usr name pass)
+      (format "Created user '%s'!" name))
+    (format "User already exists with name '%s'!" name)))

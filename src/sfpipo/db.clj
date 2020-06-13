@@ -60,7 +60,7 @@
 
 (defn delete-usr
   [username]
-  (sql/delete! sfpipo-db :users ["name = ?" name]))
+  (sql/delete! sfpipo-db :users ["name = ?" username]))
 
 (defn insert-usr
   [username password]

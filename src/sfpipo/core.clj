@@ -31,8 +31,8 @@
   (DELETE "/file/:name" [] fc/delete-file)
   (wrap-multipart-params (POST "/upload" [] fc/upload-file))
   (GET "/usr/:user-name" [] view/get-user)
-  (DELETE "/usr/:name" [] uc/delete-user)
-  (POST "/usr/:name&:pass" [] uc/create-user)
+  (DELETE "/usr/:user-name" [] view/delete-user)
+  (POST "/usr/:name&:pass" [] view/create-user)
   (not-found "<h1>This is not the page you are looking for</h1>"))
 
 ;; Prod main

@@ -11,22 +11,11 @@
     (or name (format "No such user '%s'!" name))))
 
 (defn delete-user
-  [request]
-  (if (authenticated? request)
-    (let [username (get-in request [:route-params :name])]
-      (log/info (format "Deleteing user '%s'" username))
-      (db/delete-usr username)
-      {:status 200
-       :body (format "Deleted user '%s'" username)})
-    (throw-unauthorized)))
+  [user-name]
+  (log/info (format "Deleting user '%s'" user-name))
+  (db/delete-usr user-name))
 
 (defn create-user
-  [request]
-  (if (authenticated? request)
-    (let [username (get-in request [:route-params :name])
-          password (get-in request [:route-params :pass])]
-      (log/info (format "Creating user '%s'" username))
-      (db/insert-usr username password)
-      {:status 200
-       :body (format "Created user '%s'" username)})
-    (throw-unauthorized)))
+  [name pass]
+  (log/info (format "Creating user '%s'" name))
+  (db/insert-usr name pass))

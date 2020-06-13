@@ -45,8 +45,7 @@
 (defn delete-user
   [request]
   (let [user-name (extract-req-param request :user-name)]
-    (user-controller/delete-user user-name)
-    (generate-response-page (str "Deleted user " user-name))))
+    (generate-response-page (user-controller/delete-user user-name))))
 
 (defn create-user
   [request]

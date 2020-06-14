@@ -3,15 +3,22 @@
             [hiccup.page :as page]
             [hiccup.form :as form]
             [sfpipo.user-controller :as user-controller]
+            [sfpipo.files-controller :as files-controller]
             [sfpipo.generic-controller :as generic-controller]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [ring.util.anti-forgery :as util]))
 
-(defn extract-req-param
-  [request param]
+(defn auth-request
+  [request]
   (if (authenticated? request)
-    (get-in request [:route-params param])
+    request
     (throw-unauthorized)))
+
+(defn extract-req-param
+  ([request param]
+   (get-in (auth-request request) [:route-params param]))
+  ([request param param-string]
+   (get-in (auth-request request) [:multipart-params param-string param])))
 
 (defn generate-response-page
   [header]
@@ -54,3 +61,24 @@
   (let [name (extract-req-param request :name)
         password (extract-req-param request :pass)]
     (generate-response-page (user-controller/create-user name password))))
+
+(defn list-files
+  [request]
+  (auth-request request)
+  (generate-response-page (files-controller/list-files)))
+
+(defn get-file
+  [request]
+  (let [file-name (extract-req-param request :file-name)]
+    (files-controller/get-file file-name)))
+
+(defn delete-file
+  [request]
+  (let [file-name (extract-req-param request :file-name)]
+    (files-controller/delete-file file-name)))
+
+(defn upload-file
+  [request]
+  (let [tmpfile (extract-req-param request :tempfile "file")
+        file-name (extract-req-param request :filename "file")]
+    (files-controller/upload-file tmpfile file-name)))

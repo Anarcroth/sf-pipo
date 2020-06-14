@@ -1,6 +1,5 @@
 (ns sfpipo.user-controller
   (:require [clojure.tools.logging :as log]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [sfpipo.db :as db])
   (:gen-class))
 

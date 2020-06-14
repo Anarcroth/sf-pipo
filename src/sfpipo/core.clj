@@ -12,7 +12,7 @@
             [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [sfpipo.auth :as auth]
-            [sfpipo.db :as db]
+            [sfpipo.db :refer [setup-db] :as db]
             [sfpipo.view :as view])
   (:gen-class))
 

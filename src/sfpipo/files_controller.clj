@@ -1,7 +1,6 @@
 (ns sfpipo.files-controller
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [sfpipo.db :as db])
   (:gen-class))
 

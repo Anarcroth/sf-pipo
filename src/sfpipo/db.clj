@@ -53,6 +53,11 @@
   []
   (map str (map :name (get-files)) "\n"))
 
+(defn get-file-name
+  [filename]
+  (:name (sql/query sfpipo-db ["select * from enfile where name = ?" filename]
+                    {:result-set-fn first})))
+
 (defn get-file
   [filename]
   (:file (sql/query sfpipo-db ["select * from enfile where name = ?" filename]

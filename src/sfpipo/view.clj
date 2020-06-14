@@ -75,7 +75,7 @@
 (defn delete-file
   [request]
   (let [file-name (extract-req-param request :file-name)]
-    (files-controller/delete-file file-name)))
+    (generate-response-page (files-controller/delete-file file-name))))
 
 (defn upload-file
   [request]

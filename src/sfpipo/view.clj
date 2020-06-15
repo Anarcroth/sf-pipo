@@ -26,20 +26,25 @@
    [:body
     [:h1 header]]))
 
+(defn gen-page-head
+  [title]
+  [:head
+   {:lang "en"}
+   [:title (str "Locations: " title)]
+   (page/include-css "/css/styles.css")])
+
+(def header-links
+  [:div#header-links
+   "[ " [:a {:href "/"} "Simple File Ping Pong"]
+   " | " [:a {:href "/ping"} "Ping"]
+   " | " [:a {:href "/list-files"} "List files"] " ]"])
+
 (defn greet
   [request]
-  (page/html5 {:lang "en"}
-         [:body
-          [:div [:h1 "Sfpipo"]]
-          [:p]
-          [:dev
-           (form/form-to [:get "/list-files"]
-                         (form/submit-button "List files"))]
-          [:p]
-          [:dev
-           (form/text-field {:ng-model "fileName" :placeholder "Enter a file name here"} "file-name")
-           (form/form-to [:get "/file/fileName"]
-                         (form/submit-button "Get File"))]]))
+  (page/html5
+   (gen-page-head "Simple File Ping Pong")
+   header-links
+   [:h1 "Simple File Ping Pong"]))
 
 (defn ping
   [request]

@@ -1,7 +1,6 @@
 (ns sfpipo.view
   (:require [sfpipo.user-controller :as db]
             [hiccup.page :as page]
-            [hiccup.form :as form]
             [sfpipo.user-controller :as user-controller]
             [sfpipo.files-controller :as files-controller]
             [sfpipo.generic-controller :as generic-controller]
@@ -20,17 +19,11 @@
   ([request param param-string]
    (get-in (auth-request request) [:multipart-params param-string param])))
 
-(defn generate-response-page
-  [header]
-  (page/html5
-   [:body
-    [:h1 header]]))
-
 (defn gen-page-head
   [title]
   [:head
    {:lang "en"}
-   [:title (str "Locations: " title)]
+   [:title title]
    (page/include-css "/css/styles.css")])
 
 (def header-links
@@ -38,6 +31,13 @@
    "[ " [:a {:href "/"} "Simple File Ping Pong"]
    " | " [:a {:href "/ping"} "Ping"]
    " | " [:a {:href "/list-files"} "List files"] " ]"])
+
+(defn generate-response-page
+  [title msg]
+  (page/html5
+   (gen-page-head title)
+   [:body
+    [:h1 msg]]))
 
 (defn greet
   [request]
@@ -48,29 +48,29 @@
 
 (defn ping
   [request]
-  (generate-response-page (generic-controller/ping)))
+  (generate-response-page "pong" (generic-controller/ping)))
 
 (defn get-user
   [request]
   (let [user-name (extract-req-param request :user-name)
         user (user-controller/get-user user-name)]
-    (generate-response-page (str "The user you are looking for is " user))))
+    (generate-response-page "get-usr" (str "The user you are looking for is " user))))
 
 (defn delete-user
   [request]
   (let [user-name (extract-req-param request :user-name)]
-    (generate-response-page (user-controller/delete-user user-name))))
+    (generate-response-page "delete-usr" (user-controller/delete-user user-name))))
 
 (defn create-user
   [request]
   (let [name (extract-req-param request :name)
         password (extract-req-param request :pass)]
-    (generate-response-page (user-controller/create-user name password))))
+    (generate-response-page "create-usr" (user-controller/create-user name password))))
 
 (defn list-files
   [request]
   (auth-request request)
-  (generate-response-page (files-controller/list-files)))
+  (generate-response-page "list-files" (files-controller/list-files)))
 
 (defn get-file
   [request]
@@ -80,7 +80,7 @@
 (defn delete-file
   [request]
   (let [file-name (extract-req-param request :file-name)]
-    (generate-response-page (files-controller/delete-file file-name))))
+    (generate-response-page "delete-files" (files-controller/delete-file file-name))))
 
 (defn upload-file
   [request]

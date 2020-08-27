@@ -26,3 +26,11 @@
       (db/insert-usr name pass)
       (format "Created user '%s'!" name))
     (format "User already exists with name '%s'!" name)))
+
+(defn list-users
+  []
+  (let [users (db/get-all-usernames)]
+    (log/info "Getting all users.")
+    (if (> (count users) 0)
+      (format "Found the following '%d' users:\n %s" (count users) (pr-str users))
+      (format "There are no users stored"))))

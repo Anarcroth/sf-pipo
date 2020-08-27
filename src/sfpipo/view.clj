@@ -72,6 +72,11 @@
   (auth-request request)
   (generate-response-page "list-files" (files-controller/list-files)))
 
+(defn list-users
+  [request]
+  (auth-request request)
+  (generate-response-page "list-users" (user-controller/list-users)))
+
 (defn get-file
   [request]
   (let [file-name (extract-req-param request :file-name)]

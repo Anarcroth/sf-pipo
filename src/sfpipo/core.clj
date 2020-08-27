@@ -24,6 +24,7 @@
   (GET "/" [] view/greet)
   (GET "/ping" [] view/ping)
   (GET "/list-files" [] view/list-files)
+  (GET "/list-users" [] view/list-users)
   (GET "/file/:file-name" [] view/get-file)
   (DELETE "/file/:file-name" [] view/delete-file)
   (wrap-multipart-params (POST "/upload" [] view/upload-file))

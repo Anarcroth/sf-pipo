@@ -73,6 +73,14 @@
                {:name username
                 :password (passwd/encrypt password)}))
 
+(defn get-all-users
+  []
+  (sql/query sfpipo-db ["select * from users"]))
+
+(defn get-all-usernames
+  []
+  (map str (map :name (get-all-users)) "\n"))
+
 (defn get-usr
   [username]
   (sql/query sfpipo-db ["select * from users where name = ?" username]

@@ -12,3 +12,5 @@ pom.xml.asc
 .hgignore
 .hg/
 /crypt-files
+.clj-kondo
+.lsp

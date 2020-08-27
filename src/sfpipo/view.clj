@@ -52,9 +52,8 @@
 
 (defn get-user
   [request]
-  (let [user-name (extract-req-param request :user-name)
-        user (user-controller/get-user user-name)]
-    (generate-response-page "get-usr" (str "The user you are looking for is " user))))
+  (let [user-name (extract-req-param request :user-name)]
+    (generate-response-page "get-usr" (user-controller/get-user user-name))))
 
 (defn delete-user
   [request]

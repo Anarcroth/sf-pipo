@@ -9,7 +9,9 @@
   [user-name]
   (log/info (format "Getting user '%s'" user-name))
   (let [name (:name (db/get-usr user-name))]
-    (or name (no-such-user name))))
+    (if name
+      (format "The user you are looking for is '%s'" name)
+      (no-such-user user-name))))
 
 (defn delete-user
   [user-name]

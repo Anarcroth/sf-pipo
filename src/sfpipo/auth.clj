@@ -32,7 +32,8 @@
   (let [usrname (:name (db/get-usr username))]
     (if (and (not-empty usrname)
              (= username usrname))
-      (passwd/check password (:password (db/get-usr username))))))
+      (passwd/check password (:password (db/get-usr username)))
+      false)))
 
 (defn authenticate
   [request authdata]

@@ -2,17 +2,15 @@
   (:require [ring.adapter.jetty :as webserver]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.defaults :refer :all]
-            [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [compojure.core :refer [defroutes GET POST DELETE]]
             [compojure.route :refer [not-found]]
             [environ.core :refer [env]]
             [clojure.tools.logging :as log]
             [buddy.auth.backends :as backends]
-            [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [sfpipo.auth :as auth]
-            [sfpipo.db :refer [setup-db] :as db]
+            [sfpipo.db :as db]
             [sfpipo.view :as view])
   (:gen-class))
 
@@ -20,6 +18,8 @@
               {:realm "sfpipo"
                :authfn auth/authenticate}))
 
+                                        ; there is a general problem if you pass an additional trailing '/' to each endpoint
+                                        ; logging should be a bit more adequate since it's missing some things
 (defroutes app
   (GET "/" [] view/greet)
   (GET "/ping" [] view/ping)

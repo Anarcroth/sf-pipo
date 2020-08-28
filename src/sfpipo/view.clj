@@ -1,11 +1,9 @@
 (ns sfpipo.view
-  (:require [sfpipo.user-controller :as db]
-            [hiccup.page :as page]
+  (:require [hiccup.page :as page]
             [sfpipo.user-controller :as user-controller]
             [sfpipo.files-controller :as files-controller]
             [sfpipo.generic-controller :as generic-controller]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]
-            [ring.util.anti-forgery :as util]))
+            [buddy.auth :refer [authenticated? throw-unauthorized]]))
 
 (defn auth-request
   [request]
@@ -30,21 +28,22 @@
   [:div#header-links
    "[ " [:a {:href "/"} "Simple File Ping Pong"]
    " | " [:a {:href "/ping"} "Ping"]
+   " | " [:a {:href "/list-users"} "List users"]
    " | " [:a {:href "/list-files"} "List files"] " ]"])
 
 (defn generate-response-page
-  [title msg]
-  (page/html5
-   (gen-page-head title)
-   [:body
-    [:h1 msg]]))
+  ([title msg]
+   (generate-response-page title msg ()))
+  ([title msg other]
+   (page/html5
+    (gen-page-head title)
+    [:body
+     [:h1 msg]]
+    other)))
 
 (defn greet
   [request]
-  (page/html5
-   (gen-page-head "Simple File Ping Pong")
-   header-links
-   [:h1 "Simple File Ping Pong"]))
+  (generate-response-page "Simple File Ping Pong" (generic-controller/greet) header-links))
 
 (defn ping
   [request]

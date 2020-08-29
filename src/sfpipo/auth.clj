@@ -1,5 +1,6 @@
 (ns sfpipo.auth
   (:require [crypto.password.pbkdf2 :as passwd]
+            [clojure.tools.logging :as log]
             [sfpipo.db :as db])
   (:import [java.util UUID]))
 
@@ -23,12 +24,14 @@
 
 (defn is-otp-valid?
   [username password]
+  (log/info "Validating OTP")
   (and
    (= username (str (:username session-otp)))
    (= password (:passwd session-otp))))
 
 (defn user-exists?
   [username password]
+  (log/info "Validating user '%s'" username)
   (let [usrname (:name (db/get-usr username))]
     (if (and (not-empty usrname)
              (= username usrname))

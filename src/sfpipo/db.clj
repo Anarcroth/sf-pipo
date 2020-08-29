@@ -1,8 +1,8 @@
 (ns sfpipo.db
   (:require [clojure.java.jdbc :as sql]
-            [crypto.password.pbkdf2 :as passwd])
-  (:import [java.nio.file Files Paths]
-           [java.io File]))
+            [crypto.password.pbkdf2 :as passwd]
+            [clojure.tools.logging :as log])
+  (:import [java.nio.file Files]))
 
 (def sfpipo-db (or (System/getenv "DATABASE_URL")
                    {:dbtype "postgresql"
@@ -13,25 +13,28 @@
 (defn setup-enfile-table
   []
   (try
+    (log/info "Trying to create 'enfile' database table")
     (sql/db-do-commands sfpipo-db
                         (sql/create-table-ddl :enfile
                                               [[:name "text"] [:file :bytea]]
                                               {:conditional? true}))
     (catch Exception e
-      "'enfile' table exists!")))
+      (log/warn (format "'enfile' table already exists! %s" (.getMessage e))))))
 
 (defn setup-user-table
   []
   (try
+    (log/info "Trying to create 'users' database table")
     (sql/db-do-commands sfpipo-db
                         (sql/create-table-ddl :users
                                               [[:name "text"] [:password "text"]]
                                               {:conditional? true}))
     (catch Exception e
-      "'user' table exists!")))
+      (log/warn (format "'user' table already exists! %s" (.getMessage e))))))
 
 (defn setup-db
   []
+  (log/info "Setting up database")
   (setup-enfile-table)
   (setup-user-table))
 

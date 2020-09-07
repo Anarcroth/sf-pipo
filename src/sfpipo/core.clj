@@ -4,7 +4,7 @@
             [ring.middleware.defaults :refer :all]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [compojure.core :refer [defroutes GET POST DELETE]]
-            [compojure.route :refer [not-found]]
+            [compojure.route :refer [not-found resources]]
             [environ.core :refer [env]]
             [clojure.tools.logging :as log]
             [buddy.auth.backends :as backends]
@@ -19,7 +19,6 @@
                :authfn auth/authenticate}))
 
                                         ; there is a general problem if you pass an additional trailing '/' to each endpoint
-                                        ; logging should be a bit more adequate since it's missing some things
 (defroutes app
   (GET "/" [] view/greet)
   (GET "/ping" [] view/ping)
@@ -31,6 +30,7 @@
   (GET "/usr/:user-name" [] view/get-user)
   (DELETE "/usr/:user-name" [] view/delete-user)
   (POST "/usr/:name&:pass" [] view/create-user)
+  (resources "/")
   (not-found "<h1>This is not the page you are looking for</h1>"))
 
 ;; Prod main

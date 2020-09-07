@@ -13,7 +13,7 @@
 (defn return-result
   [msg name]
   (let [result (format msg name)]
-    (log/ingo result)
+    (log/info result)
     result))
 
 (defn list-files

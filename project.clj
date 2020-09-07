@@ -7,6 +7,7 @@
                  [org.clojure/tools.logging "1.0.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [org.clojure/java.jdbc "0.6.1"]
+                 [org.clojure/clojurescript "1.10.773"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [ring "1.8.0"]
                  [ring/ring-defaults "0.3.2"]
@@ -14,12 +15,20 @@
                  [environ "1.1.0"]
                  [buddy/buddy-auth "2.2.0"]
                  [crypto-password "0.2.1"]
-                 [hiccup "1.0.5"]]
+                 [hiccup "1.0.5"]
+                 [com.fasterxml.jackson.core/jackson-core "2.10.2"]]
   :min-lein-version "2.0.0"
   :uberjar-name "sfpipo.jar"
   :main ^:skip-aot sfpipo.core
   :profiles {:dev {:main sfpipo.core/-dev-main
-                   :plugins [[lein-environ "1.0.0"]]
-                   :env {:squiggly {:checkers [:eastwood :kibit :typed]}}}
+                   :plugins [[lein-environ "1.0.0"]
+                             [lein-cljsbuild "1.1.8"]]
+                   :env {:squiggly {:checkers [:eastwood :kibit :typed]}}
+                   :cljsbuild {:builds [{:source-paths ["src" "dev"]
+                                         :compiler {:output-to "target/classes/public/sfpipoapp.js"
+                                                    :output-dir "target/classes/public/out"
+                                                    :optimizations :none
+                                                    :recompile-dependents true
+                                                    :source-map true}}]}}
              :uberjar {:aot :all
                        :env {:production true}}})

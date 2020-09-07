@@ -43,7 +43,7 @@
 
 (defn greet
   [request]
-  (generate-response-page "Simple File Ping Pong" (generic-controller/greet) header-links))
+  (slurp "resources/public/index.html"))
 
 (defn ping
   [request]

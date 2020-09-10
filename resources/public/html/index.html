@@ -7,14 +7,10 @@
   </head>
   <body>
     <h1>SFPIPO: Simple File Ping-Pong</h1>
-    <div>
-      <a href="/">Sfpipo</a>
-      <a href="/ping">ping</a>
-      <a href="/list-users">List users</a>
-      <a href="/list-files">List files</a>
-    </div>
+    <div id="sfpipo-main"></div>
     <script src="out/goog/base.js"></script>
     <script src="sfpipoapp.js"></script>
-    <script>goog.require("sfpipo.client");</script>
+    <script>goog.require("sfpipo.index");</script>
+    <script>sfpipo.index.init_lists();</script>
   </body>
 </html>

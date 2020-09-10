@@ -43,7 +43,7 @@
 
 (defn greet
   [request]
-  (slurp "resources/public/index.html"))
+  (slurp "resources/public/html/index.html"))
 
 (defn ping
   [request]

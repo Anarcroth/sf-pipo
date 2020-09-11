@@ -1,12 +1,27 @@
 body {
-    background-color: Cornsilk;
+    background-color: #282C34;
 }
 
-#header-links {
-    background-color: BurlyWood;
-    padding: 100px;
+table, th, td {
+    border: 3px;
+    color: #E06C75;
+    text-align: left;
+}
+
+a:link, a:visited {
+    font-weight: bold;
+    background-color: #4B5363;
+    color: #E5C07B;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+a:hover, a:active {
+    background-color: #567B9A;
 }
 
 h1 {
-    color: #ff00ff;
+    color: #61AFEF;
 }

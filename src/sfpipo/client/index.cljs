@@ -1,4 +1,4 @@
-(ns sfpipo.index
+(ns sfpipo.client.index
   (:require [reagent.core :as r :refer [atom]]))
 
 (enable-console-print!)

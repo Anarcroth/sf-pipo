@@ -1,8 +1,8 @@
-(ns sfpipo.view
+(ns sfpipo.ws.sfpipo-controller
   (:require [hiccup.page :as page]
-            [sfpipo.user-controller :as user-controller]
-            [sfpipo.files-controller :as files-controller]
-            [sfpipo.generic-controller :as generic-controller]
+            [sfpipo.services.user-service :as user-service]
+            [sfpipo.services.files-service :as files-service]
+            [sfpipo.services.generic-service :as generic-service]
             [buddy.auth :refer [authenticated? throw-unauthorized]]))
 
 (defn auth-request
@@ -24,13 +24,6 @@
    [:title title]
    (page/include-css "/css/styles.css")])
 
-(def header-links
-  [:div#header-links
-   "[ " [:a {:href "/"} "Simple File Ping Pong"]
-   " | " [:a {:href "/ping"} "Ping"]
-   " | " [:a {:href "/list-users"} "List users"]
-   " | " [:a {:href "/list-files"} "List files"] " ]"])
-
 (defn generate-response-page
   ([title msg]
    (generate-response-page title msg ()))
@@ -47,46 +40,46 @@
 
 (defn ping
   [request]
-  (generate-response-page "pong" (generic-controller/ping)))
+  (generate-response-page "pong" (generic-service/ping)))
 
 (defn get-user
   [request]
   (let [user-name (extract-req-param request :user-name)]
-    (generate-response-page "get-usr" (user-controller/get-user user-name))))
+    (generate-response-page "get-usr" (user-service/get-user user-name))))
 
 (defn delete-user
   [request]
   (let [user-name (extract-req-param request :user-name)]
-    (generate-response-page "delete-usr" (user-controller/delete-user user-name))))
+    (generate-response-page "delete-usr" (user-service/delete-user user-name))))
 
 (defn create-user
   [request]
   (let [name (extract-req-param request :name)
         password (extract-req-param request :pass)]
-    (generate-response-page "create-usr" (user-controller/create-user name password))))
+    (generate-response-page "create-usr" (user-service/create-user name password))))
 
 (defn list-files
   [request]
   (auth-request request)
-  (generate-response-page "list-files" (files-controller/list-files)))
+  (generate-response-page "list-files" (files-service/list-files)))
 
 (defn list-users
   [request]
   (auth-request request)
-  (generate-response-page "list-users" (user-controller/list-users)))
+  (generate-response-page "list-users" (user-service/list-users)))
 
 (defn get-file
   [request]
   (let [file-name (extract-req-param request :file-name)]
-    (files-controller/get-file file-name)))
+    (files-service/get-file file-name)))
 
 (defn delete-file
   [request]
   (let [file-name (extract-req-param request :file-name)]
-    (generate-response-page "delete-files" (files-controller/delete-file file-name))))
+    (generate-response-page "delete-files" (files-service/delete-file file-name))))
 
 (defn upload-file
   [request]
   (let [tmpfile (extract-req-param request :tempfile "file")
         file-name (extract-req-param request :filename "file")]
-    (files-controller/upload-file tmpfile file-name)))
+    (files-service/upload-file tmpfile file-name)))

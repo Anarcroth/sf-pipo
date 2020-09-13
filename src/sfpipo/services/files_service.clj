@@ -1,4 +1,4 @@
-(ns sfpipo.files-controller
+(ns sfpipo.services.files-service
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [sfpipo.db :as db])

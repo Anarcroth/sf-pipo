@@ -11,7 +11,7 @@
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [sfpipo.auth :as auth]
             [sfpipo.db :as db]
-            [sfpipo.view :as view])
+            [sfpipo.ws.sfpipo-controller :as controller])
   (:gen-class))
 
 (def backend (backends/basic
@@ -20,16 +20,16 @@
 
                                         ; there is a general problem if you pass an additional trailing '/' to each endpoint
 (defroutes app
-  (GET "/" [] view/greet)
-  (GET "/ping" [] view/ping)
-  (GET "/list-files" [] view/list-files)
-  (GET "/list-users" [] view/list-users)
-  (GET "/file/:file-name" [] view/get-file)
-  (DELETE "/file/:file-name" [] view/delete-file)
-  (wrap-multipart-params (POST "/upload" [] view/upload-file))
-  (GET "/usr/:user-name" [] view/get-user)
-  (DELETE "/usr/:user-name" [] view/delete-user)
-  (POST "/usr/:name&:pass" [] view/create-user)
+  (GET "/" [] controller/greet)
+  (GET "/ping" [] controller/ping)
+  (GET "/list-files" [] controller/list-files)
+  (GET "/list-users" [] controller/list-users)
+  (GET "/file/:file-name" [] controller/get-file)
+  (DELETE "/file/:file-name" [] controller/delete-file)
+  (wrap-multipart-params (POST "/upload" [] controller/upload-file))
+  (GET "/usr/:user-name" [] controller/get-user)
+  (DELETE "/usr/:user-name" [] controller/delete-user)
+  (POST "/usr/:name&:pass" [] controller/create-user)
   (resources "/")
   (not-found "<h1>This is not the page you are looking for</h1>"))
 

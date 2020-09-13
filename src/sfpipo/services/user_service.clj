@@ -1,4 +1,4 @@
-(ns sfpipo.user-controller
+(ns sfpipo.services.user-service
   (:require [clojure.tools.logging :as log]
             [sfpipo.db :as db])
   (:gen-class))

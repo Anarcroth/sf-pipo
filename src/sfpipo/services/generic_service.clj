@@ -1,4 +1,4 @@
-(ns sfpipo.generic-controller
+(ns sfpipo.services.generic-service
   (:require [clojure.tools.logging :as log]))
 
 (defn greet "Handle greet request." []

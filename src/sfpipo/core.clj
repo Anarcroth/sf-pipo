@@ -14,9 +14,9 @@
             [sfpipo.ws.sfpipo-controller :as controller])
   (:gen-class))
 
-(def backend (backends/basic
-              {:realm "sfpipo"
-               :authfn auth/authenticate}))
+(def backend
+  (backends/basic
+   {:realm "sfpipo" :authfn auth/authenticate}))
 
                                         ; there is a general problem if you pass an additional trailing '/' to each endpoint
 (defroutes app

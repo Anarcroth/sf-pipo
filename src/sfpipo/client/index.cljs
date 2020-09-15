@@ -11,34 +11,25 @@
    {:endpoint "/list-users" :name "list-users"}
    {:endpoint "/list-files" :name "list-files"}])
 
-(defonce pong-res (r/atom 0))
+(defonce pong-res (r/atom ""))
 
 (defn create-controller-links
   [links]
   (map (fn [link] [:p>a {:href (:endpoint link)} (:name link)]) links))
 
-(defn show-pong []
-  [:div "pong"
-   [:p "this is a pong"]])
-
-(defn rendre-pong-res []
-  (r/render-component
-   [show-pong]
-   (.getElementById js/document "button-here")))
-
 (defn static-ping
   []
   (go (let [response (<! (http/get "/ping"))]
-        (if (= (:status response) 200)
-          (do
-            (prn "it works")
-            #(swap! @pong-res inc))
-          (prn "response is not 200")))))
+        (= (:status response) 200))))
 
-(defn button-here []
-  [:div {:id "button-here"}
-   [:input {:type "button" :value "here"
-            :on-click #(static-ping)}]])
+(defn handle-ping-press []
+  (if (static-ping)
+      #(swap! pong-res (fn [] (str "Pong! Service is up :)")))))
+
+(defn ping-button []
+  [:div {:id "ping-button"}
+   [:input {:type "button" :value "Ping"
+            :on-click (handle-ping-press)}]])
 
 (defn get-lists
   "Get the default 3 functionalities for the current time being."
@@ -47,7 +38,7 @@
    [:ul
     (create-controller-links controller-links)]
    [:p @pong-res]
-   [button-here]])
+   [ping-button]])
 
 (defn init-lists []
   (r/render-component

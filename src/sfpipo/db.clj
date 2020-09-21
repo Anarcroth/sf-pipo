@@ -48,13 +48,14 @@
   [name]
   (sql/delete! sfpipo-db :enfile ["name = ?" name]))
 
-(defn get-files
-  []
+(defn get-file-objects []
   (sql/query sfpipo-db ["select * from enfile"]))
 
-(defn get-file-names
-  []
-  (map str (map :name (get-files)) "\n"))
+(defn get-whole-files []
+  (map :file (sql/query sfpipo-db ["select file from enfile"])))
+
+(defn get-file-names []
+  (map :name (sql/query sfpipo-db ["select name from enfile"])))
 
 (defn get-file-name
   [filename]

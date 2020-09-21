@@ -34,7 +34,7 @@
 
 (defn ping-button []
   [:div {:id "ping-button"}
-   [:input {:type "button" :value "Ping"
+   [:input {:type "button" :value "Ping" :class ["button"]
             :on-click (handle-ping-press)}]])
 
 (defn download-button []
@@ -68,6 +68,7 @@
     (create-controller-links controller-links)]
    [:p @pong-res]
    [ping-button]
+   [:p @file-upload-res]
    [file-input]])
 
 (defn init-lists []

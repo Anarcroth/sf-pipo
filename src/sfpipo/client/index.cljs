@@ -13,6 +13,8 @@
 
 (defonce pong-res (r/atom ""))
 
+(defonce file-upload-res (r/atom ""))
+
 (defn create-controller-links
   [links]
   (map (fn [link] [:p>a {:href (:endpoint link)} (:name link)]) links))
@@ -41,18 +43,22 @@
     [:input {:type "text"}]
     [:input {:type "submit" :value "Download file"}]]])
 
+(defn handle-file-upload [f]
+  (if (save-file-to-db f)
+    #(swap! file-upload-res (fn [] (str "File uploaded!")))))
+
+(defn save-file-to-db [f]
+  (go (let [response (<! (http/post "/upload" {:multipart-params [["file" f]]}))]
+        (= (:status response) 200))))
+
 (defn file-input [on-result]
   [:input {:type "file"
            :on-change
-           (fn [e]
-             (let [f (first (array-seq (.. e -target -files)))
-                   reader (js/FileReader.)]
-               (aset reader "onload"
-                     (fn [e]
-                       (on-result (.. e -target -result))))
-               (.readAsText reader f)))
-           ; :on-result is needed here
-           }])
+           (fn [this]
+             (if (not (= "" (-> this .-target .-value)))
+               (let [^js/File file (-> this .-target .-files (aget 0))]
+                 (save-file-to-db file)
+                 (set! (-> this .-target .-value) ""))))}])
 
 (defn get-lists
   "Get the default 3 functionalities for the current time being."

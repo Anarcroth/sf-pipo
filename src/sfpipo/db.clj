@@ -14,10 +14,16 @@
   []
   (try
     (log/info "Trying to create 'enfile' database table")
-    (sql/db-do-commands sfpipo-db
-                        (sql/create-table-ddl :enfile
-                                              [[:name "text"] [:file :bytea]]
-                                              {:conditional? true}))
+    (sql/db-do-commands
+     sfpipo-db
+     (sql/create-table-ddl :enfile
+                           [[:name "text"]
+                            [:file :bytea]
+                            [:id :uuid]
+                            [:size :bigint]
+                            [:downloadable_link "text"]
+                            [:owner :uuid]]
+                           {:conditional? true}))
     (catch Exception e
       (log/warn (format "'enfile' table already exists! %s" (.getMessage e))))))
 
@@ -25,10 +31,13 @@
   []
   (try
     (log/info "Trying to create 'users' database table")
-    (sql/db-do-commands sfpipo-db
-                        (sql/create-table-ddl :users
-                                              [[:name "text"] [:password "text"]]
-                                              {:conditional? true}))
+    (sql/db-do-commands
+     sfpipo-db
+     (sql/create-table-ddl :users
+                           [[:name "text"]
+                            [:password "text"]
+                            [:id :uuid]]
+                           {:conditional? true}))
     (catch Exception e
       (log/warn (format "'user' table already exists! %s" (.getMessage e))))))
 

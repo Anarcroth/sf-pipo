@@ -2,7 +2,8 @@
   (:require [clojure.java.jdbc :as sql]
             [crypto.password.pbkdf2 :as passwd]
             [clojure.tools.logging :as log])
-  (:import [java.nio.file Files]))
+  (:import [java.nio.file Files]
+           [java.util UUID]))
 
 (def sfpipo-db (or (System/getenv "DATABASE_URL")
                    {:dbtype "postgresql"
@@ -59,7 +60,12 @@
   [name]
   (sql/delete! sfpipo-db :enfile ["name = ?" name]))
 
-(defn get-file-objects
+(defn delete-file-by-id
+  "Delete a file by `file-id` from the `enfile` table."
+  [file-id]
+  (sql/delete! sfpipo-db :enfile ["id = ?" (UUID/fromString file-id)]))
+
+(defn get-all-files
   "Gather all `enfile` file objects from the `enfile` table."
   []
   (sql/query sfpipo-db ["select * from enfile"]))
@@ -67,7 +73,7 @@
 (defn get-file-by-id
   "Get file object by `file-id` from `enfile` table."
   [file-id]
-  (sql/query sfpipo-db ["select * from enfile where id = ?" file-id]))
+  (sql/query sfpipo-db ["select * from enfile where id = ?" (UUID/fromString file-id)]))
 
 (defn get-whole-files
   "Get only the files as bytes from the `enfile` table."
@@ -77,7 +83,10 @@
 (defn get-whole-file-by-id
   "Get only the file as bytes by `file-id` from the `enfile` table."
   [file-id]
-  (:file (sql/query sfpipo-db ["select file from enfile where id = ?" file-id])))
+  (:file
+   (sql/query sfpipo-db
+              ["select file from enfile where id = ?" (UUID/fromString file-id)]
+              {:result-set-fn first})))
 
 (defn get-file-names
   "Get only the file names from the `enfile` table."
@@ -87,7 +96,10 @@
 (defn get-file-name-by-id
   "Get only the file name by `file-id` from the `enfile` table."
   [file-id]
-  (:name (sql/query sfpipo-db ["select name from enfile where id = ?" file-id])))
+  (:name
+   (sql/query sfpipo-db
+              ["select name from enfile where id = ?" (UUID/fromString file-id)]
+              {:result-set-fn first})))
 
 (defn get-file-sizes
   "Get only the file sizes from the `enfile` table."
@@ -97,7 +109,10 @@
 (defn get-file-size-by-id
   "Get only the file size by `file-id` from the `enfile` table."
   [file-id]
-  (:size (sql/query sfpipo-db ["select size from enfile where id = ?" file-id])))
+  (:size
+   (sql/query sfpipo-db
+              ["select size from enfile where id = ?" (UUID/fromString file-id)]
+              {:result-set-fn first})))
 
 (defn get-file-downloadable-links
   "Get only the downloadable links from the `enfile` table."
@@ -107,7 +122,10 @@
 (defn get-file-downloadable-link
   "Get only the downloadable link for a file."
   [file-id]
-  (:downloadable_link (sql/query sfpipo-db ["select downloadable_link from enfile where id = ?" file-id])))
+  (:downloadable_link
+       (sql/query sfpipo-db
+                  ["select downloadable_link from enfile where id = ?" (UUID/fromString file-id)]
+                  {:result-set-fn first})))
 
 (defn get-file-name
   "`Deprecated`. Kept for backwards compatibility."
@@ -119,9 +137,8 @@
 (defn get-files
   "Get same named files by `filename` from the `enfile` table."
   [filename]
-  (:file (sql/query sfpipo-db
-                    ["select * from enfile where name = ?" filename]
-                    {:result-set-fn first})))
+  (map :file (sql/query sfpipo-db
+                    ["select * from enfile where name = ?" filename])))
 
 (defn get-file
   [filename]
@@ -137,7 +154,7 @@
 (defn delete-usr-by-id
   "Delete user by `user-id` from the `users` table."
   [user-id]
-  (sql/delete! sfpipo-db :users ["id = ?" user-id]))
+  (sql/delete! sfpipo-db :users ["id = ?" (UUID/fromString user-id)]))
 
 (defn insert-usr
   [username password]
@@ -152,7 +169,7 @@
 (defn get-user-by-id
   "Get user by `user-id` from the `users` table."
   [user-id]
-  (sql/query sfpipo-db ["select * from users where id = ?" user-id]))
+  (sql/query sfpipo-db ["select * from users where id = ?" (UUID/fromString user-id)]))
 
 (defn get-all-usernames
   []

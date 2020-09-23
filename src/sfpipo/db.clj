@@ -48,6 +48,13 @@
   (setup-enfile-table)
   (setup-user-table))
 
+(defn get-from-file-by-id
+  [param name id]
+  (param
+   (sql/query sfpipo-db
+              [(format "select %s from enfile where id = ?" name) (UUID/fromString id)]
+              {:result-set-fn first})))
+
 (defn insert-file
   [name file]
   (sql/insert! sfpipo-db :enfile
@@ -84,10 +91,7 @@
 (defn get-whole-file-by-id
   "Get only the file as bytes by `file-id` from the `enfile` table."
   [file-id]
-  (:file
-   (sql/query sfpipo-db
-              ["select file from enfile where id = ?" (UUID/fromString file-id)]
-              {:result-set-fn first})))
+  (get-from-file-by-id :file "file" file-id))
 
 (defn get-file-names
   "Get only the file names from the `enfile` table."
@@ -97,10 +101,7 @@
 (defn get-file-name-by-id
   "Get only the file name by `file-id` from the `enfile` table."
   [file-id]
-  (:name
-   (sql/query sfpipo-db
-              ["select name from enfile where id = ?" (UUID/fromString file-id)]
-              {:result-set-fn first})))
+  (get-from-file-by-id :name "name" file-id))
 
 (defn get-file-sizes
   "Get only the file sizes from the `enfile` table."
@@ -110,10 +111,7 @@
 (defn get-file-size-by-id
   "Get only the file size by `file-id` from the `enfile` table."
   [file-id]
-  (:size
-   (sql/query sfpipo-db
-              ["select size from enfile where id = ?" (UUID/fromString file-id)]
-              {:result-set-fn first})))
+  (get-from-file-by-id :size "size" file-id))
 
 (defn get-file-downloadable-links
   "Get only the downloadable links from the `enfile` table."
@@ -123,10 +121,7 @@
 (defn get-file-downloadable-link
   "Get only the downloadable link for a file."
   [file-id]
-  (:downloadable_link
-       (sql/query sfpipo-db
-                  ["select downloadable_link from enfile where id = ?" (UUID/fromString file-id)]
-                  {:result-set-fn first})))
+  (get-from-file-by-id :downloadable_link "downloadable_link" file-id))
 
 (defn get-file-name
   "`Deprecated`. Kept for backwards compatibility."

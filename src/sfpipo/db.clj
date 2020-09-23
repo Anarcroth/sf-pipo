@@ -56,7 +56,8 @@
                 :size (Files/size (.toPath file))}))
 
 (defn delete-file
-  "Delete a file object from the `enfile` table with the given `name`."
+  "`Deprecated`. Kept for backwards compatibility.
+  Delete a file object from the `enfile` table with the given `name`."
   [name]
   (sql/delete! sfpipo-db :enfile ["name = ?" name]))
 

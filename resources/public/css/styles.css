@@ -28,9 +28,20 @@ body {
 }
 
 table, th, td {
-    border: 3px;
+    padding: 5px;
     color: #E06C75;
     text-align: left;
+    border: 3px solid #61AFEF;
+    border-collapse: collapse;
+}
+
+tr:hover {
+    background-color: #61AFEF22;
+}
+
+th {
+    font-weight: bold;
+    text-align: center;
 }
 
 a:link, a:visited {

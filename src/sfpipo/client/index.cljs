@@ -70,10 +70,16 @@
 
 (defn- create-file-table [f]
   (r/render-component
-   [:table>tbody>tr
-    [:th (:name f)]
-    [:th (:size f)]
-    [:th (:id f)]]
+   [:table>tbody
+    [:tr
+     [:th "Id"]
+     [:th "Name"]
+     [:th "Size"]]
+    [:tr
+     [:td (:id f)]
+     [:td (:name f)]
+     [:td (:size f)]
+     ]]
    (.getElementById js/document "file-table")))
 
 (defn get-file-from-db [file-name]

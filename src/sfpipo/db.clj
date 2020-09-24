@@ -136,6 +136,11 @@
   (map :file (sql/query sfpipo-db
                     ["select * from enfile where name = ?" filename])))
 
+(defn get-file-by-name
+  "Get first matched file object by `filename` from `enfile` table."
+  [filename]
+  (sql/query sfpipo-db ["select * from enfile where name = ?" filename] {:result-set-fn first}))
+
 (defn get-file
   [filename]
   (:file (sql/query sfpipo-db

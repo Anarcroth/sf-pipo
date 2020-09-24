@@ -60,6 +60,36 @@
                  (save-file-to-db file)
                  (set! (-> this .-target .-value) ""))))}])
 
+(defn- parse-file-res [res]
+  (as-> res r
+      (:body r)
+      (.parse js/JSON r)
+      (js->clj r :keywordize-keys true)))
+
+(def file-name-input (r/atom ""))
+
+(defn- create-file-table [f]
+  (r/render-component
+   [:table>tbody>tr
+    [:th (:name f)]
+    [:th (:size f)]
+    [:th (:id f)]]
+   (.getElementById js/document "file-table")))
+
+(defn get-file-from-db [file-name]
+  "Get file from db and output file name, size, link, etc"
+  (go (let [response (<! (http/get (str "/file/" file-name)))]
+        (if (= (:status response) 200)
+          (create-file-table (parse-file-res response))))))
+
+(defn form []
+  [:div
+   [:input {:type "text"
+            :value @file-name-input
+            :on-change #(reset! file-name-input (.-value (.-target %)))
+            }]
+   [:button  {:on-click #(get-file-from-db @file-name-input)} "Type file name"]])
+
 (defn get-lists
   "Get the default 3 functionalities for the current time being."
   []
@@ -69,7 +99,8 @@
    [:p @pong-res]
    [ping-button]
    [:p @file-upload-res]
-   [file-input]])
+   [file-input]
+   [form]])
 
 (defn init-lists []
   (r/render-component

@@ -3,7 +3,8 @@
             [sfpipo.services.user-service :as user-service]
             [sfpipo.services.files-service :as files-service]
             [sfpipo.services.generic-service :as generic-service]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]))
+            [buddy.auth :refer [authenticated? throw-unauthorized]]
+            [clojure.data.json :as json]))
 
 (defn auth-request
   [request]
@@ -68,10 +69,16 @@
   (auth-request request)
   (generate-response-page "list-users" (user-service/list-users)))
 
+(defn format-data [f]
+  (-> f
+      (dissoc :file)
+      (update :id str)))
+
 (defn get-file
   [request]
-  (let [file-name (extract-req-param request :file-name)]
-    (files-service/get-file file-name)))
+  (let [file-name (extract-req-param request :file-name)
+        file (files-service/get-file file-name)]
+    (json/write-str (format-data file))))
 
 (defn delete-file
   [request]

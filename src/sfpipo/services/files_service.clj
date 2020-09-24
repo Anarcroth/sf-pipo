@@ -28,9 +28,9 @@
   "Get file by filename, saved on the fs."
   [file-name]
   (log/info (format "Getting file '%s'" file-name))
-  (let [file (db/get-file file-name)]
+  (let [file (db/get-file-by-name file-name)]
     (if (not-empty file)
-      (io/input-stream (db/get-file file-name))
+      file
       (return-result "File '%s' was not found!" file-name))))
 
 (defn delete-file

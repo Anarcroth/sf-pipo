@@ -19,7 +19,8 @@
                  ;; this is needed to satisfy clojurescript? dep needs
                  [com.fasterxml.jackson.core/jackson-core "2.10.2"]
                  [reagent "0.8.0"]
-                 [cljs-http "0.1.46"]]
+                 [cljs-http "0.1.46"]
+                 [org.clojure/data.json "1.0.0"]]
   :min-lein-version "2.0.0"
   :uberjar-name "sfpipo.jar"
   :main ^:skip-aot sfpipo.core

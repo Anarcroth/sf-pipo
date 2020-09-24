@@ -33,6 +33,14 @@
       file
       (return-result "File '%s' was not found!" file-name))))
 
+(defn download-file
+  [filename]
+  (log/info (format "Downloading file '%s'" filename))
+  (let [file (db/get-file-by-name filename)]
+    (if (not-empty file)
+      (io/input-stream file)
+      (return-result "File '%s' was not found!" filename))))
+
 (defn delete-file
   "Delete file by filename, saved on the fs."
   [file-name]

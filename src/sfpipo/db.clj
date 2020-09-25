@@ -81,7 +81,7 @@
 (defn get-file-by-id
   "Get file object by `file-id` from `enfile` table."
   [file-id]
-  (sql/query sfpipo-db ["select * from enfile where id = ?" (UUID/fromString file-id)]))
+  (sql/query sfpipo-db ["select * from enfile where id = ?" (UUID/fromString file-id)] {:result-set-fn first}))
 
 (defn get-whole-files
   "Get only the files as bytes from the `enfile` table."
@@ -130,7 +130,7 @@
                     ["select * from enfile where name = ?" filename]
                     {:result-set-fn first})))
 
-(defn get-files
+(defn get-files-by-name
   "Get same named files by `filename` from the `enfile` table."
   [filename]
   (map :file (sql/query sfpipo-db

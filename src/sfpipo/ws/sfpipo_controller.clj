@@ -1,23 +1,6 @@
 (ns sfpipo.ws.sfpipo-controller
-  (:require [hiccup.page :as page]
+  (:require [compojure.core :refer [routes GET]]
             [sfpipo.services.generic-service :as generic-service]))
-
-(defn gen-page-head
-  [title]
-  [:head
-   {:lang "en"}
-   [:title title]
-   (page/include-css "/css/styles.css")])
-
-(defn generate-response-page
-  ([title msg]
-   (generate-response-page title msg ()))
-  ([title msg other]
-   (page/html5
-    (gen-page-head title)
-    [:body
-     [:h1 msg]]
-    other)))
 
 (defn greet
   [request]
@@ -25,4 +8,9 @@
 
 (defn ping
   [request]
-  (generate-response-page "pong" (generic-service/ping)))
+  (generic-service/ping))
+
+(defn generic-routes []
+  (routes
+   (GET "/" [] greet)
+   (GET "/ping" [] ping)))

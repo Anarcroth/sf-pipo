@@ -10,8 +10,9 @@
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [sfpipo.auth :as auth]
             [sfpipo.db :as db]
+            [sfpipo.ws.user-controller :as user-controller]
             [sfpipo.ws.files-controller :as files-controller]
-            [sfpipo.ws.user-controller :as user-controller])
+            [sfpipo.ws.sfpipo-controller :as generic-controller])
   (:gen-class))
 
 (def backend
@@ -19,6 +20,7 @@
    {:realm "sfpipo" :authfn auth/authenticate}))
 
 (defroutes app
+  (context "" [] (generic-controller/generic-routes))
   (context "/user" [] (user-controller/user-routes))
   (context "/file" [] (files-controller/file-routes))
   (resources "/")

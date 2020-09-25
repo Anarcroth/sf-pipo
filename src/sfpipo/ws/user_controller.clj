@@ -23,14 +23,14 @@
 
 (defn get-user
   [request]
-  (let [user-id (extract-req-param request :id)
-        user (user-service/get-user user-id)]
+  (let [user-name (extract-req-param request :name)
+        user (user-service/get-user user-name)]
     (json/write-str (format-data user))))
 
 (defn delete-user
   [request]
-  (let [user-id (extract-req-param request :id)]
-    (user-service/delete-user user-id)))
+  (let [user-name (extract-req-param request :name)]
+    (user-service/delete-user user-name)))
 
 (defn create-user
   [request]
@@ -40,7 +40,7 @@
 
 (defn user-routes []
   (routes
-   (GET "/:id" [] get-user)
-   (PUT "/:id" [] ) ; TODO implement me
-   (DELETE "/:id" [] delete-user)
+   (GET "/:name" [] get-user)
+   (PUT "/:name" [] ) ; TODO implement me
+   (DELETE "/:name" [] delete-user)
    (POST "/create/:name&:pass" [] create-user)))

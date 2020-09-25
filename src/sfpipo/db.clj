@@ -152,14 +152,9 @@
   (sql/update! sfpipo-db :enfile {key new-name} ["id = ?" (UUID/fromString file-id)]))
 
 (defn delete-usr
-  "`Deprecated`. Kept for backwards compatibility."
-  [username]
-  (sql/delete! sfpipo-db :users ["name = ?" username]))
-
-(defn delete-usr-by-id
-  "Delete user by `user-id` from the `users` table."
-  [user-id]
-  (sql/delete! sfpipo-db :users ["id = ?" (UUID/fromString user-id)]))
+  "Delete user by `user-name` from the `users` table."
+  [user-name]
+  (sql/delete! sfpipo-db :users ["name = ?" user-name]))
 
 (defn insert-usr
   [username password]
@@ -167,22 +162,9 @@
                {:name username
                 :password (passwd/encrypt password)}))
 
-(defn get-all-users
-  []
-  (sql/query sfpipo-db ["select * from users"]))
-
-(defn get-user-by-id
-  "Get user by `user-id` from the `users` table."
-  [user-id]
-  (sql/query sfpipo-db ["select * from users where id = ?" (UUID/fromString user-id)]))
-
-(defn get-all-usernames
-  []
-  (map str (map :name (get-all-users)) "\n"))
-
 (defn get-usr
-  "`Deprecated`. Kept for backwards compatibility."
-  [username]
+  "Get user by `user-name` from the `users` table."
+  [user-name]
   (sql/query sfpipo-db
-             ["select * from users where name = ?" username]
+             ["select * from users where name = ?" user-name]
              {:result-set-fn first}))

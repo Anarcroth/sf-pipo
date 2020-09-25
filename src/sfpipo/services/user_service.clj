@@ -22,21 +22,21 @@
     result))
 
 (defn get-user
-  [user-name]
-  (log/info (format "Getting user '%s'" user-name))
-  (let [name (:name (db/get-usr user-name))]
-    (if name
-      (return-result "The user you are looking for is '%s'" name)
-      (no-such-user user-name))))
+  [user-id]
+  (log/info (format "Getting user with id [%s]" user-id))
+  (let [user (:name (db/get-usr-by-id user-id))]
+    (if user
+      user
+      (no-such-user user-id))))
 
 (defn delete-user
-  [user-name]
-  (log/info (format "Deleting user '%s'" user-name))
-  (if (db/get-usr user-name)
+  [user-id]
+  (log/info (format "Deleting user with id [%s]" user-id))
+  (if (db/get-usr user-id)
     (do
-      (db/delete-usr user-name)
-      (return-result "Deleted user '%s'" user-name))
-    (no-such-user user-name)))
+      (db/delete-usr-by-id user-id)
+      (return-result "Deleted user [%s]" user-id))
+    (no-such-user user-id)))
 
 (defn create-user
   [name pass]

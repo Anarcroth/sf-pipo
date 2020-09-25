@@ -141,11 +141,15 @@
   [filename]
   (sql/query sfpipo-db ["select * from enfile where name = ?" filename] {:result-set-fn first}))
 
-(defn get-file
+(defn get-whole-file-by-name
   [filename]
   (:file (sql/query sfpipo-db
                     ["select * from enfile where name = ?" filename]
                     {:result-set-fn first})))
+
+(defn update-file
+  [file-id key new-name]
+  (sql/update! sfpipo-db :enfile {key new-name} ["id = ?" (UUID/fromString file-id)]))
 
 (defn delete-usr
   "`Deprecated`. Kept for backwards compatibility."

@@ -1,20 +1,14 @@
 (ns sfpipo.ws.user-controller
   (:require [compojure.core :refer [routes GET POST DELETE PUT]]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [sfpipo.services.user-service :as user-service]
+            [sfpipo.auth :as auth]
             [clojure.data.json :as json]))
-
-(defn auth-request
-  [request]
-  (if (authenticated? request)
-    request
-    (throw-unauthorized)))
 
 (defn extract-req-param
   ([request param]
-   (get-in (auth-request request) [:route-params param]))
+   (get-in (auth/auth-request request) [:route-params param]))
   ([request param param-string]
-   (get-in (auth-request request) [:multipart-params param-string param])))
+   (get-in (auth/auth-request request) [:multipart-params param-string param])))
 
 (defn format-data [u]
   (-> u

@@ -1,22 +1,15 @@
 (ns sfpipo.ws.files-controller
   (:require [compojure.core :refer [routes GET POST DELETE PUT]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]
+            [sfpipo.auth :as auth]
             [sfpipo.services.files-service :as files-service]
-            [clojure.data.json :as json]
-            [sfpipo.db :as db]))
-
-(defn- auth-request
-  [request]
-  (if (authenticated? request)
-    request
-    (throw-unauthorized)))
+            [clojure.data.json :as json]))
 
 (defn- extract-req-param
   ([request param]
-   (get-in (auth-request request) [:route-params param]))
+   (get-in (auth/auth-request request) [:route-params param]))
   ([request param param-string]
-   (get-in (auth-request request) [:multipart-params param-string param])))
+   (get-in (auth/auth-request request) [:multipart-params param-string param])))
 
 (defn format-data [f]
   (-> f
@@ -48,7 +41,7 @@
     (files-service/upload-file tmpfile file-name)))
 
 (defn- get-all-files [request]
-  (auth-request request)
+  (auth/auth-request request)
   (json/write-str (map format-data (files-service/get-all-files))))
 
 (defn file-routes []

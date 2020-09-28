@@ -1,6 +1,7 @@
 (ns sfpipo.auth
   (:require [crypto.password.pbkdf2 :as passwd]
             [clojure.tools.logging :as log]
+            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [sfpipo.db :as db])
   (:import [java.util UUID]))
 
@@ -44,3 +45,9 @@
         password (:password authdata)]
     (or (is-otp-valid? username password)
         (user-exists? username password))))
+
+(defn auth-request
+  [request]
+  (if (authenticated? request)
+    request
+    (throw-unauthorized)))

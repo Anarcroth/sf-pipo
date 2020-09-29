@@ -1,6 +1,5 @@
 (ns sfpipo.ws.files-controller
   (:require [compojure.core :refer [routes GET POST DELETE PUT]]
-            [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [sfpipo.auth :as auth]
             [sfpipo.services.files-service :as files-service]
             [clojure.data.json :as json]))
@@ -45,6 +44,14 @@
   (auth/auth-request request)
   (json/write-str (map format-data (files-service/get-all-files))))
 
+(defn- get-all-files-by-ids [request]
+  (let [ids (:ids (:params request))]
+    (map files-service/get-file-by-id ids)))
+
+(defn- delete-all-file-by-ids [request]
+  (let [ids (:ids (:params request))]
+    (map files-service/delete-file-by-id ids)))
+
 (defn file-routes []
   (routes
    (GET "/:id" [] get-file)
@@ -53,5 +60,5 @@
    (PUT "/:id/rename/:name" [] rename-file)
    (POST "/upload" [] upload-file)
    (GET "/all/" [] get-all-files)
-   (GET "/all/:ids" []) ; TODO implement me
-   (DELETE "/all/:ids" []))) ; TODO implement me
+   (GET "/all/ids" [] get-all-files-by-ids)
+   (DELETE "/all/ids" [] delete-all-file-by-ids)))

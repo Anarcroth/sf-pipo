@@ -35,10 +35,10 @@
   "Get file by filename, saved on the fs."
   [file-id]
   (log/info (format "Getting file with id [%s]" file-id))
-  (let [file (db/get-file-name-by-id file-id)]
-    (if (not-empty file)
+  (let [file (db/get-file-by-id file-id)]
+    (if file
       file
-      (return-result "File with id [%s] doesn't exist!" file-id))))
+      (return-result "File with id [%s] doesn't exist!\n" file-id))))
 
 (defn rename-file
   [file-id new-name]
@@ -71,8 +71,8 @@
   (if (db/get-file-by-id file-id)
     (do
       (db/delete-file-by-id file-id)
-      (return-result "Deleted '%s'" file-id))
-    (return-result "No such file '%s' exists!" file-id)))
+      (return-result "Deleted '%s'\n" file-id))
+    (return-result "File with id [%s] doesn't exists!\n" file-id)))
 
 (defn upload-file
   "Save a passed file `tmpfile` with `file-name` to db."

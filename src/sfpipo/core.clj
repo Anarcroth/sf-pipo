@@ -2,6 +2,8 @@
   (:require [ring.adapter.jetty :as webserver]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.defaults :refer :all]
+            [ring.middleware.json :refer [wrap-json-params]]
+            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             [compojure.core :refer [context defroutes]]
             [compojure.route :refer [not-found resources]]
@@ -35,6 +37,8 @@
   (db/setup-db)
   (let [port (Integer. (or port (env :port) 8000))]
     (as-> app $
+      (wrap-keyword-params $)
+      (wrap-json-params $)
       (wrap-multipart-params $)
       (wrap-authorization $ backend)
       (wrap-authentication $ backend)
@@ -48,6 +52,8 @@
   (db/setup-db)
   (let [port (Integer. (or port (env :port) 8000))]
     (as-> (wrap-reload #'app) $
+      (wrap-keyword-params $)
+      (wrap-json-params $)
       (wrap-multipart-params $)
       (wrap-authorization $ backend)
       (wrap-authentication $ backend)

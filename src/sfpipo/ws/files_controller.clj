@@ -54,7 +54,7 @@
 
 (defn file-routes []
   (routes
-   (GET "/:id" [] get-file)
+   (GET "/:id" [] get-file) ; TODO add option to specify if only a specific parameter is wanted, ex only whole file or size or link
    (DELETE "/:id" [] delete-file)
    (PUT "/:id/replace" [] replace-file)
    (PUT "/:id/rename/:name" [] rename-file)

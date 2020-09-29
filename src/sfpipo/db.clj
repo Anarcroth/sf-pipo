@@ -65,12 +65,6 @@
                  :file (Files/readAllBytes (.toPath file))
                  :size (Files/size (.toPath file))})))
 
-(defn delete-file
-  "`Deprecated`. Kept for backwards compatibility.
-  Delete a file object from the `enfile` table with the given `name`."
-  [name]
-  (sql/delete! sfpipo-db :enfile ["name = ?" name]))
-
 (defn delete-file-by-id
   "Delete a file by `file-id` from the `enfile` table."
   [file-id]
@@ -125,13 +119,6 @@
   "Get only the downloadable link for a file."
   [file-id]
   (get-from-file-by-id :downloadable_link "downloadable_link" file-id))
-
-(defn get-file-name
-  "`Deprecated`. Kept for backwards compatibility."
-  [filename]
-  (:name (sql/query sfpipo-db
-                    ["select * from enfile where name = ?" filename]
-                    {:result-set-fn first})))
 
 (defn get-files-by-name
   "Get same named files by `filename` from the `enfile` table."

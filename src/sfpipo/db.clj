@@ -56,11 +56,14 @@
               {:result-set-fn first})))
 
 (defn insert-file
-  [name file]
-  (sql/insert! sfpipo-db :enfile
-               {:name name
-                :file (Files/readAllBytes (.toPath file))
-                :size (Files/size (.toPath file))}))
+  ([name file]
+   (insert-file name file (UUID/randomUUID)))
+  ([name file id]
+   (sql/insert! sfpipo-db :enfile
+                {:id id
+                 :name name
+                 :file (Files/readAllBytes (.toPath file))
+                 :size (Files/size (.toPath file))})))
 
 (defn delete-file
   "`Deprecated`. Kept for backwards compatibility.

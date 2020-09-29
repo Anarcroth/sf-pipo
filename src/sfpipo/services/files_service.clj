@@ -2,6 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [sfpipo.db :as db])
+  (:import [java.util UUID])
   (:gen-class))
 
 (defn handle-list-files
@@ -73,19 +74,19 @@
       (return-result "Deleted '%s'" file-id))
     (return-result "No such file '%s' exists!" file-id)))
 
-(defn delete-file
-  "Delete file by filename, saved on the fs."
-  [file-id]
-  (log/info (format "Deleting file '%s'" file-id))
-  (if (db/get-file-by-id file-id)
-    (do
-      (db/delete-file-by-id file-id)
-      (return-result "Deleted '%s'" file-id))
-    (return-result "No such file '%s' exists!" file-id)))
-
 (defn upload-file
   "Save a passed file `tmpfile` with `file-name` to db."
   [tmpfile file-name]
   (log/info (format "Uploading '%s' file" file-name))
   (db/insert-file file-name tmpfile)
   (return-result "Uploaded '%s'" file-name))
+
+(defn replace-file
+  [file-id name file]
+  (log/info (format "Replacing file with id [%s]" file-id))
+  (if (db/get-file-by-id file-id)
+    (do
+      (delete-file-by-id file-id)
+      (db/insert-file name file (UUID/fromString file-id))
+      (return-result "File with id [%s] replaced!" file-id))
+    (return-result "File with id [%s] doesn't exist!" file-id)))

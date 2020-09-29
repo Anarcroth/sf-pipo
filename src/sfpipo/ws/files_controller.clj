@@ -21,10 +21,11 @@
         file (files-service/get-file-by-id file-id)]
     (json/write-str (format-data file))))
 
-(defn- update-file [request]
-  (let [file-id (extract-req-param request :id)])
-  ; TODO implement me
-  )
+(defn- replace-file [request]
+  (let [file-id (extract-req-param request :id)
+        file (extract-req-param request :tempfile "file")
+        file-name (extract-req-param request :filename "file")]
+    (files-service/replace-file file-id file-name file)))
 
 (defn- rename-file [request]
   (let [file-id (extract-req-param request :id)
@@ -47,10 +48,10 @@
 (defn file-routes []
   (routes
    (GET "/:id" [] get-file)
-   (PUT "/:id" [] update-file)
-   (PUT "/:id/rename/:name" [] rename-file)
    (DELETE "/:id" [] delete-file)
-   (wrap-multipart-params (POST "/upload" [] upload-file))
+   (PUT "/:id/replace" [] replace-file)
+   (PUT "/:id/rename/:name" [] rename-file)
+   (POST "/upload" [] upload-file)
    (GET "/all/" [] get-all-files)
    (GET "/all/:ids" []) ; TODO implement me
    (DELETE "/all/:ids" []))) ; TODO implement me

@@ -68,6 +68,12 @@
     (.parse js/JSON r)
     (js->clj r :keywordize-keys true)))
 
+(defn- delete-file [file-id]
+  (prn file-id)
+  ;; TODO update the table state when done
+  ;; probs needs to be some atom or some shit idk it's a dom
+  (go (let [response (<! (http/delete (str "/file/" file-id)))])))
+
 (defn- create-file-table [f]
   (r/render-component
    [:div
@@ -76,11 +82,13 @@
      [:tr
       [:th "Id"]
       [:th "Name"]
-      [:th "Size"]]
+      [:th "Size"]
+      [:th "Action"]]
      [:tr
       [:td (:id f)]
       [:td (:name f)]
       [:td (:size f)]
+      [:td [:button {:on-click #(delete-file (:id f))} "Delete"]]
       ]]]
    (.getElementById js/document "file-table")))
 

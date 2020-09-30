@@ -34,8 +34,8 @@
    [:input {:type "button" :value "Ping" :class ["button"]
             :on-click (handle-ping-press)}]])
 
-(defn- get-file [name]
-  (go (let [response (<! (http/get (str "/file/" name)))]
+(defn- get-file [file-id]
+  (go (let [response (<! (http/get (str "/file/" file-id)))]
         (prn response))))
 
 (defn download-button []
@@ -45,7 +45,7 @@
     [:input {:type "submit" :value "Download file"}]]])
 
 (defn- save-file-to-db [f]
-  (go (let [response (<! (http/post "/upload" {:multipart-params [["file" f]]}))]
+  (go (let [response (<! (http/post "/file/upload" {:multipart-params [["file" f]]}))]
         (= (:status response) 200))))
 
 (defn- handle-file-upload [f]
@@ -94,8 +94,8 @@
 
 (defn get-file-from-db
   "Get file from db and output file name, size, link, etc"
-  [file-name]
-  (go (let [response (<! (http/get (str "/file/" file-name)))]
+  [file-id]
+  (go (let [response (<! (http/get (str "/file/" file-id)))]
         (if (= (:status response) 200)
           (create-file-table (parse-file-res response))))))
 

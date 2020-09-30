@@ -6,18 +6,9 @@
 
 (enable-console-print!)
 
-(defonce controller-links
-  [{:endpoint "/ping" :name "ping"}
-   {:endpoint "/list-users" :name "list-users"}
-   {:endpoint "/list-files" :name "list-files"}])
 (defonce pong-res (r/atom ""))
 (defonce file-upload-res (r/atom ""))
 (defonce file-name-input (r/atom ""))
-
-(defn- create-controller-links
-  "Creates link tags for each endpoint defined in `controller-links`."
-  [links]
-  (map (fn [link] [:p>a {:href (:endpoint link)} (:name link)]) links))
 
 (defn- call-ping
   []
@@ -111,8 +102,6 @@
   "Get the default 3 functionalities for the current time being."
   []
   [:div
-   [:ul
-    (create-controller-links controller-links)]
    [:p @pong-res]
    [ping-button]
    [:p @file-upload-res]

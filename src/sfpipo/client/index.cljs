@@ -60,10 +60,8 @@
     (js->clj r :keywordize-keys true)))
 
 (defn- delete-file [file-id]
-  (prn file-id)
-  ;; TODO update the table state when done
-  ;; probs needs to be some atom or some shit idk it's a dom
-  (go (let [response (<! (http/delete (str "/file/" file-id)))])))
+  (go (let [response (<! (http/delete (str "/file/" file-id)))]))
+  (create-file-table))
 
 (defn- create-file-table [f]
   (r/render-component
